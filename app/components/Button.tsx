@@ -142,6 +142,7 @@ const $baseTextStyle: TextStyle = {
   flexShrink: 1,
   flexGrow: 0,
   zIndex: 2,
+  color: colors.palette.darker,
 }
 
 const $rightAccessoryStyle: ViewStyle = { marginStart: spacing.xs, zIndex: 1 }

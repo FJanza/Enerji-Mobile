@@ -133,7 +133,7 @@ const $buttonContainer: ViewStyle = {
 }
 
 const $hint: TextStyle = {
-  color: colors.palette.neutral600,
+  color: colors.palette.neutral200,
   fontSize: 12,
   lineHeight: 15,
   paddingBottom: spacing.lg,

@@ -11,12 +11,14 @@ const palette = {
   neutral800: "#191015",
   neutral900: "#000000",
 
-  primary100: "#F4E0D9",
-  primary200: "#E8C1B4",
-  primary300: "#DDA28E",
-  primary400: "#D28468",
-  primary500: "#C76542",
-  primary600: "#A54F31",
+  primary100: "#fafafa",
+  primary200: "#E7E7E7",
+  primary300: "#C8E5FF",
+  primary400: "#92D8FF",
+  primary500: "#23D9F2",
+  primary600: "#1986A9",
+
+  darker: "#061F24",
 
   secondary100: "#DCDDE9",
   secondary200: "#BCC0D6",
@@ -51,7 +53,7 @@ export const colors = {
   /**
    * The default text color in many components.
    */
-  text: palette.neutral800,
+  text: palette.neutral200,
   /**
    * Secondary text information.
    */
@@ -59,7 +61,7 @@ export const colors = {
   /**
    * The default color of the screen background.
    */
-  background: palette.neutral200,
+  background: palette.darker,
   /**
    * The default border color.
    */
