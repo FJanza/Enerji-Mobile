@@ -71,8 +71,6 @@ const AppStack = observer(function AppStack() {
       {/* @demo remove-block-start */}
       {isAuthenticated ? (
         <>
-          {/* @demo remove-block-end */}
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
           {/* @demo remove-block-start */}
           <Stack.Screen name="Demo" component={DemoNavigator} />
         </>

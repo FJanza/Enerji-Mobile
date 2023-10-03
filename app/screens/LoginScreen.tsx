@@ -1,12 +1,14 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
-import { TextInput, TextStyle, ViewStyle } from "react-native"
-import { Button, Icon, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
+import { Image, ImageStyle, TextInput, View, ViewStyle } from "react-native"
+import { Button, Icon, Screen, TextField, TextFieldAccessoryProps } from "../components"
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
+
+const logo = require("../../assets/images/logoEnerji.png")
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
   const authPasswordInput = useRef<TextInput>()
@@ -72,47 +74,45 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       contentContainerStyle={$screenContentContainer}
       safeAreaEdges={["top", "bottom"]}
     >
-      <Text testID="login-heading" tx="loginScreen.signIn" preset="heading" style={$signIn} />
-      <Text tx="loginScreen.enterDetails" preset="subheading" style={$enterDetails} />
-      {attemptsCount > 2 && <Text tx="loginScreen.hint" size="sm" weight="light" style={$hint} />}
+      <Image style={$logo} source={logo} resizeMode="contain" />
 
-      <TextField
-        value={authEmail}
-        onChangeText={setAuthEmail}
-        containerStyle={$textField}
-        autoCapitalize="none"
-        autoComplete="email"
-        autoCorrect={false}
-        keyboardType="email-address"
-        labelTx="loginScreen.emailFieldLabel"
-        placeholderTx="loginScreen.emailFieldPlaceholder"
-        helper={error}
-        status={error ? "error" : undefined}
-        onSubmitEditing={() => authPasswordInput.current?.focus()}
-      />
-
-      <TextField
-        ref={authPasswordInput}
-        value={authPassword}
-        onChangeText={setAuthPassword}
-        containerStyle={$textField}
-        autoCapitalize="none"
-        autoComplete="password"
-        autoCorrect={false}
-        secureTextEntry={isAuthPasswordHidden}
-        labelTx="loginScreen.passwordFieldLabel"
-        placeholderTx="loginScreen.passwordFieldPlaceholder"
-        onSubmitEditing={login}
-        RightAccessory={PasswordRightAccessory}
-      />
-
-      <Button
-        testID="login-button"
-        tx="loginScreen.tapToSignIn"
-        style={$tapButton}
-        preset="reversed"
-        onPress={login}
-      />
+      <View>
+        <TextField
+          value={authEmail}
+          onChangeText={setAuthEmail}
+          containerStyle={$textField}
+          autoCapitalize="none"
+          autoComplete="email"
+          autoCorrect={false}
+          keyboardType="email-address"
+          labelTx="loginScreen.emailFieldLabel"
+          placeholderTx="loginScreen.emailFieldPlaceholder"
+          helper={error}
+          status={error ? "error" : undefined}
+          onSubmitEditing={() => authPasswordInput.current?.focus()}
+        />
+        <TextField
+          ref={authPasswordInput}
+          value={authPassword}
+          onChangeText={setAuthPassword}
+          containerStyle={$textField}
+          autoCapitalize="none"
+          autoComplete="password"
+          autoCorrect={false}
+          secureTextEntry={isAuthPasswordHidden}
+          labelTx="loginScreen.passwordFieldLabel"
+          placeholderTx="loginScreen.passwordFieldPlaceholder"
+          onSubmitEditing={login}
+          RightAccessory={PasswordRightAccessory}
+        />
+        <Button
+          testID="login-button"
+          tx="loginScreen.tapToSignIn"
+          style={$tapButton}
+          preset="reversed"
+          onPress={login}
+        />
+      </View>
     </Screen>
   )
 })
@@ -120,19 +120,13 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 const $screenContentContainer: ViewStyle = {
   paddingVertical: spacing.xxl,
   paddingHorizontal: spacing.lg,
+  justifyContent: "space-around",
+  flex: 1,
 }
 
-const $signIn: TextStyle = {
-  marginBottom: spacing.sm,
-}
-
-const $enterDetails: TextStyle = {
-  marginBottom: spacing.lg,
-}
-
-const $hint: TextStyle = {
-  color: colors.tint,
-  marginBottom: spacing.md,
+const $logo: ImageStyle = {
+  height: 130,
+  width: "100%",
 }
 
 const $textField: ViewStyle = {
@@ -141,6 +135,7 @@ const $textField: ViewStyle = {
 
 const $tapButton: ViewStyle = {
   marginTop: spacing.xs,
+  backgroundColor: colors.palette.primary600,
 }
 
 // @demo remove-file

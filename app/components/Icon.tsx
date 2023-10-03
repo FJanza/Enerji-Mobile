@@ -110,6 +110,7 @@ export const iconRegistry = {
   home: require("../../assets/icons/home.png"),
   comida: require("../../assets/icons/comida.png"),
   mancuernas: require("../../assets/icons/mancuernas.png"),
+  usuario: require("../../assets/icons/user.png"),
 }
 
 const $imageStyle: ImageStyle = {

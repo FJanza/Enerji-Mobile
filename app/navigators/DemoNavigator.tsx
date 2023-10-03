@@ -1,7 +1,7 @@
 import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import { CompositeScreenProps } from "@react-navigation/native"
 import React from "react"
-import { TextStyle, ViewStyle } from "react-native"
+import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
@@ -11,11 +11,14 @@ import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 
 export type DemoTabParamList = {
-  DemoCommunity: undefined
+  Home: undefined
+  Perfil: undefined
   DemoShowroom: { queryIndex?: string; itemIndex?: string }
   DemoDebug: undefined
   DemoPodcastList: undefined
 }
+
+const logo = require("../../assets/images/logoEnerji.png")
 
 /**
  * Helper for automatically generating navigation prop types for each route.
@@ -35,28 +38,21 @@ export function DemoNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: [$tabBar, { height: bottom + 70 }],
         tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.text,
         tabBarLabelStyle: $tabBarLabel,
         tabBarItemStyle: $tabBarItem,
+        header: () => (
+          <View style={{ backgroundColor: colors.palette.primary700, paddingVertical: spacing.xs }}>
+            <Image style={$logo} source={logo} resizeMode="contain" />
+          </View>
+        ),
       }}
     >
-      {/* <Tab.Screen
-        name="DemoShowroom"
-        component={DemoShowroomScreen}
-        options={{
-          tabBarLabel: translate("demoNavigator.componentsTab"),
-          tabBarIcon: ({ focused }) => (
-            <Icon icon="components" color={focused && colors.tint} size={30} />
-          ),
-        }}
-      /> */}
-
       <Tab.Screen
-        name="DemoCommunity"
+        name="Home"
         component={DemoCommunityScreen}
         options={{
           tabBarLabel: translate("demoNavigator.home"),
@@ -88,12 +84,23 @@ export function DemoNavigator() {
           ),
         }}
       />
+
+      <Tab.Screen
+        name="Perfil"
+        component={DemoDebugScreen}
+        options={{
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ focused }) => (
+            <Icon icon="usuario" color={focused && colors.tint} size={40} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   )
 }
 
 const $tabBar: ViewStyle = {
-  backgroundColor: "#0c4b58",
+  backgroundColor: colors.palette.primary700,
   borderTopColor: colors.transparent,
 }
 
@@ -108,4 +115,7 @@ const $tabBarLabel: TextStyle = {
   flex: 1,
 }
 
-// @demo remove-file
+const $logo: ImageStyle = {
+  height: 50,
+  width: "100%",
+}
