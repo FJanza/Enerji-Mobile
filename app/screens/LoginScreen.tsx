@@ -5,12 +5,20 @@ import { Button, Icon, Screen, TextField, TextFieldAccessoryProps } from "../com
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "app/store"
+import { setUser } from "app/store/user"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 const logo = require("../../assets/images/logoEnerji.png")
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
+  const { dni, personalInformation, physicalInformation } = useSelector(
+    (state: RootState) => state.user,
+  )
+  const distpach = useDispatch()
+
   const authPasswordInput = useRef<TextInput>()
 
   const [authPassword, setAuthPassword] = useState("")
@@ -104,6 +112,35 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           placeholderTx="loginScreen.passwordFieldPlaceholder"
           onSubmitEditing={login}
           RightAccessory={PasswordRightAccessory}
+        />
+        <Button
+          testID="login-button"
+          text="mostrar info"
+          style={$tapButton}
+          preset="reversed"
+          onPress={() => {
+            console.log({ dni, personalInformation, physicalInformation })
+          }}
+        />
+        <Button
+          testID="login-button"
+          text="set info"
+          style={$tapButton}
+          preset="reversed"
+          onPress={() => {
+            distpach(
+              setUser({
+                dni: 11111111,
+                personalInformation: {
+                  email: "example@gmail.com",
+                  birthDate: 22222222222,
+                  name: "aaaaaaaaaaaa",
+                  lastName: "aaaaaaaaaaaaa",
+                },
+                physicalInformation: { heigth: 1, weigth: 1, objective: "a" },
+              }),
+            )
+          }}
         />
         <Button
           testID="login-button"
