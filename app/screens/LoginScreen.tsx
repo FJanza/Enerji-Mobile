@@ -1,6 +1,8 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import {
+  Alert,
+  Dimensions,
   Image,
   ImageStyle,
   Modal,
@@ -19,10 +21,14 @@ import { colors, spacing } from "../theme"
 import { layout } from "app/theme/global"
 import { User } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
+import Toast from "react-native-simple-toast"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 const logo = require("../../assets/images/logoEnerji.png")
+
+const windowWidth = Dimensions.get("window").width
+const windowHeight = Dimensions.get("window").height
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
   // const definitions = {
@@ -39,18 +45,17 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isAuthCreatePasswordHidden, setIsAuthCreatePasswordHidden] = useState(true)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [attemptsCount, setAttemptsCount] = useState(0)
+
   const [userRegister, setUserRegister] = useState<Partial<User>>({})
   const {
-    authenticationStore: { authEmail, setAuthEmail, setAuthToken, validationError },
+    authenticationStore: { authEmail, setAuthEmail, setAuthToken },
   } = useStores()
 
   useEffect(() => {
     // Here is where you could fetch credentials from keychain or storage
     // and pre-fill the form fields.
-    setAuthEmail("ignite@infinite.red")
-    setAuthPassword("ign1teIsAwes0m3")
+    setAuthEmail("")
+    setAuthPassword("")
 
     // Return a "cleanup" function that React will run when the component unmounts
     return () => {
@@ -59,29 +64,24 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     }
   }, [])
 
-  const error = isSubmitted ? validationError : ""
+  const showAlert = (texto: string) => {
+    Alert.alert("Error", texto)
+  }
 
-  async function login() {
+  const login = async () => {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: "someone@email.com",
-      password: "xLhlywurAJBiUzhLKgPI",
+      email: authEmail,
+      password: authPassword,
     })
+    console.log({ data, error })
 
-    console.log(data, error)
-
-    setIsSubmitted(true)
-    setAttemptsCount(attemptsCount + 1)
-
-    if (validationError) return
-
-    // Make a request to your server to get an authentication token.
-    // If successful, reset the fields and set the token.
-    setIsSubmitted(false)
-    setAuthPassword("")
-    setAuthEmail("")
-
-    // We'll mock this with a fake token.
-    setAuthToken(String(Date.now()))
+    if (error?.message) {
+      showAlert(error.message)
+    } else {
+      setAuthPassword("")
+      setAuthEmail("")
+      setAuthToken(data.session.access_token)
+    }
   }
 
   const PasswordRightAccessory = useMemo(
@@ -115,6 +115,15 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     [isAuthCreatePasswordHidden],
   )
 
+  const handleRegister = async () => {
+    const { data, error } = await supabase.auth.signUp({
+      email: userRegister.email,
+      password: userRegister.password,
+    })
+    console.log({ data, error })
+    setOpenRegisterModal(false)
+  }
+
   return (
     <Screen
       preset="auto"
@@ -122,7 +131,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       safeAreaEdges={["top", "bottom"]}
     >
       <Image style={$logo} source={logo} resizeMode="contain" />
-
       <View>
         <TextField
           value={authEmail}
@@ -134,8 +142,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           keyboardType="email-address"
           labelTx="loginScreen.emailFieldLabel"
           placeholderTx="loginScreen.emailFieldPlaceholder"
-          helper={error}
-          status={error ? "error" : undefined}
           onSubmitEditing={() => authPasswordInput.current?.focus()}
         />
         <TextField
@@ -149,7 +155,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           secureTextEntry={isAuthPasswordHidden}
           labelTx="loginScreen.passwordFieldLabel"
           placeholderTx="loginScreen.passwordFieldPlaceholder"
-          onSubmitEditing={login}
+          helper="La contraseña debe tener 6 caracteres"
+          HelperTextProps={{ size: "xs" }}
           RightAccessory={PasswordRightAccessory}
         />
         <Button
@@ -168,98 +175,110 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           </View>
         </View>
       </View>
+      {/* REGISTER MODAL */}
       <Modal animationType="slide" transparent={true} visible={openRegisterModal}>
-        <View style={$cardModal}>
-          <SafeAreaView>
-            <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={layout.Center}>
+          <View style={$cardModal}>
+            <View style={$bodyModal}>
               <View style={[layout.rowSpacing, $headingModal]}>
                 <Text text="Registrate" preset="subheading" />
                 <Pressable onPress={() => setOpenRegisterModal(false)}>
                   <Icon icon="x" color="white" />
                 </Pressable>
               </View>
-              <View style={$bodyModal}>
-                <TextField
-                  label="Nombre"
-                  onChangeText={(e) =>
-                    setUserRegister((prev) => {
-                      return { ...prev, name: e !== "" ? e : undefined }
-                    })
-                  }
-                />
-                <TextField
-                  label="Apellido"
-                  onChangeText={(e) =>
-                    setUserRegister((prev) => {
-                      return { ...prev, lastName: e !== "" ? e : undefined }
-                    })
-                  }
-                />
-                <TextField
-                  label="Email"
-                  onChangeText={(e) =>
-                    setUserRegister((prev) => {
-                      return { ...prev, email: e !== "" ? e : undefined }
-                    })
-                  }
-                />
-                <TextField
-                  label="Contraseña"
-                  RightAccessory={CreatePasswordRightAccessory}
-                  secureTextEntry={isAuthCreatePasswordHidden}
-                  onChangeText={(e) =>
-                    setUserRegister((prev) => {
-                      return { ...prev, password: e !== "" ? e : undefined }
-                    })
-                  }
-                />
-                <TextField
-                  label="Fecha de nacimiento"
-                  placeholder="dd/mm/yyyy"
-                  placeholderTextColor={"#a3a3a3"}
-                />
-
-                <TextField
-                  label="Peso"
-                  placeholder="Ej: 76 en Kg"
-                  placeholderTextColor={"#a3a3a3"}
-                  onChangeText={(e) =>
-                    setUserRegister((prev) => {
-                      return { ...prev, weight: e !== "" ? e : undefined }
-                    })
-                  }
-                />
-                <TextField
-                  label="Altura"
-                  keyboardType="decimal-pad"
-                  placeholder="175 en cm"
-                  placeholderTextColor={"#a3a3a3"}
-                  onChangeText={(e) =>
-                    setUserRegister((prev) => {
-                      return { ...prev, height: e !== "" ? e : undefined }
-                    })
-                  }
-                />
-                <TextField
-                  label="Tipo de cuerpo"
-                  placeholder="Ej: hectomorfo"
-                  placeholderTextColor={"#a3a3a3"}
-                />
-                <TextField
-                  label="Tipo de dieta"
-                  placeholder="Ej: 175 en cm"
-                  placeholderTextColor={"#a3a3a3"}
-                />
-
+              <SafeAreaView>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  <View style={$internalBodyModal}>
+                    <TextField
+                      label="Nombre"
+                      onChangeText={(e) =>
+                        setUserRegister((prev) => {
+                          return { ...prev, name: e !== "" ? e : undefined }
+                        })
+                      }
+                    />
+                    <TextField
+                      label="Apellido"
+                      onChangeText={(e) =>
+                        setUserRegister((prev) => {
+                          return { ...prev, lastName: e !== "" ? e : undefined }
+                        })
+                      }
+                    />
+                    <TextField
+                      label="Email"
+                      onChangeText={(e) =>
+                        setUserRegister((prev) => {
+                          return { ...prev, email: e !== "" ? e : undefined }
+                        })
+                      }
+                    />
+                    <TextField
+                      label="Contraseña"
+                      helper="La contraseña debe tener 6 caracteres"
+                      RightAccessory={CreatePasswordRightAccessory}
+                      secureTextEntry={isAuthCreatePasswordHidden}
+                      onChangeText={(e) =>
+                        setUserRegister((prev) => {
+                          return { ...prev, password: e !== "" ? e : undefined }
+                        })
+                      }
+                    />
+                    <TextField
+                      label="Fecha de nacimiento"
+                      placeholder="dd/mm/yyyy"
+                      placeholderTextColor={"#a3a3a3"}
+                    />
+                    <TextField
+                      label="Peso"
+                      placeholder="Ej: 76 en Kg"
+                      placeholderTextColor={"#a3a3a3"}
+                      onChangeText={(e) =>
+                        setUserRegister((prev) => {
+                          return { ...prev, weight: e !== "" ? e : undefined }
+                        })
+                      }
+                    />
+                    <TextField
+                      label="Altura"
+                      keyboardType="decimal-pad"
+                      placeholder="175 en cm"
+                      placeholderTextColor={"#a3a3a3"}
+                      onChangeText={(e) =>
+                        setUserRegister((prev) => {
+                          return { ...prev, height: e !== "" ? e : undefined }
+                        })
+                      }
+                    />
+                    <TextField
+                      label="Tipo de cuerpo"
+                      placeholder="Ej: hectomorfo"
+                      placeholderTextColor={"#a3a3a3"}
+                    />
+                    <TextField
+                      label="Tipo de dieta"
+                      placeholder="Ej: 175 en cm"
+                      placeholderTextColor={"#a3a3a3"}
+                    />
+                  </View>
+                </ScrollView>
+              </SafeAreaView>
+              <View style={{ paddingHorizontal: spacing.md }}>
                 <Button
                   text="Register"
                   style={$tapButton}
                   preset="reversed"
-                  onPress={() => console.log(userRegister)}
+                  onPress={() => handleRegister()}
+                  disabled={userRegister.email === "" && userRegister.password === ""}
+                />
+                <Text
+                  text="Recuerda que luego de registrarte debe confirmar el proceso con el email que te enviamos"
+                  size="xs"
+                  weight="bold"
                 />
               </View>
-            </ScrollView>
-          </SafeAreaView>
+            </View>
+          </View>
         </View>
       </Modal>
     </Screen>
@@ -267,8 +286,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 })
 
 const $cardModal: ViewStyle = {
-  margin: 20,
-  backgroundColor: "gray",
+  backgroundColor: colors.palette.primary700,
   borderRadius: 20,
   alignItems: "center",
   shadowColor: "#000",
@@ -279,21 +297,31 @@ const $cardModal: ViewStyle = {
   shadowOpacity: 0.25,
   shadowRadius: 4,
   elevation: 5,
-  width: "90%",
-  paddingBottom: 10,
+  width: windowWidth * 0.9,
+  paddingBottom: spacing.sm,
+  height: windowHeight * 0.85,
 }
 
 const $headingModal: ViewStyle = {
   width: "100%",
-  paddingHorizontal: 25,
-  paddingVertical: 10,
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
   alignItems: "center",
+  backgroundColor: colors.palette.primary600,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
 }
 
 const $bodyModal: ViewStyle = {
   width: "100%",
-  paddingHorizontal: 25,
-  paddingVertical: 10,
+  gap: spacing.sm,
+  height: "65%",
+}
+
+const $internalBodyModal: ViewStyle = {
+  width: "100%",
+  paddingHorizontal: spacing.md,
+  paddingVertical: spacing.sm,
   gap: spacing.sm,
 }
 

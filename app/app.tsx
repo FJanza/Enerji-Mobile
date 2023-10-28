@@ -50,8 +50,6 @@ function App(props: AppProps) {
     isRestored: isNavigationStateRestored,
   } = useNavigationPersistence(storage, NAVIGATION_PERSISTENCE_KEY)
 
-  // TODO poner la instancia de supabase
-
   const [areFontsLoaded] = useFonts(customFontsToLoad)
 
   const { rehydrated } = useInitialRootStore(() => {
