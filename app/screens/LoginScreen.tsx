@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useMemo, useRef, useState } from "react"
 import {
-  Alert,
   Dimensions,
   Image,
   ImageStyle,
@@ -29,6 +28,10 @@ const logo = require("../../assets/images/logoEnerji.png")
 
 const windowWidth = Dimensions.get("window").width
 const windowHeight = Dimensions.get("window").height
+
+// TODO pasar a env
+const LOGIN_WITH_AUTH = true
+// TODO pasar a env
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
   // const definitions = {
@@ -65,22 +68,27 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }, [])
 
   const showAlert = (texto: string) => {
-    Alert.alert("Error", texto)
+    Toast.show(texto, Toast.SHORT)
   }
 
   const login = async () => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: authEmail,
-      password: authPassword,
-    })
-    console.log({ data, error })
+    if (LOGIN_WITH_AUTH) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: authEmail,
+        password: authPassword,
+      })
 
-    if (error?.message) {
-      showAlert(error.message)
+      console.log({ data, error })
+
+      if (error?.message) {
+        showAlert(error.message)
+      } else {
+        setAuthPassword("")
+        setAuthEmail("")
+        setAuthToken(data.session.access_token)
+      }
     } else {
-      setAuthPassword("")
-      setAuthEmail("")
-      setAuthToken(data.session.access_token)
+      setAuthToken("aaaaaaaaaaaaaaaaaaaa")
     }
   }
 
@@ -353,7 +361,6 @@ const $textField: ViewStyle = {
 
 const $tapButton: ViewStyle = {
   marginTop: spacing.xs,
-  backgroundColor: colors.palette.primary600,
 }
 
 // @demo remove-file

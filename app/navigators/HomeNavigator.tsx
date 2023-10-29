@@ -6,9 +6,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
 import { DemoCommunityScreen, DemoDebugScreen } from "../screens"
-import { DemoPodcastListScreen } from "../screens/DemoPodcastListScreen"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
+import Home from "app/screens/Routines/Home"
+import Profile from "app/screens/Profile"
 
 export type DemoTabParamList = {
   Home: undefined
@@ -32,7 +33,7 @@ export type DemoTabScreenProps<T extends keyof DemoTabParamList> = CompositeScre
 
 const Tab = createBottomTabNavigator<DemoTabParamList>()
 
-export function DemoNavigator() {
+export function HomeNavigator() {
   const { bottom } = useSafeAreaInsets()
 
   return (
@@ -64,7 +65,7 @@ export function DemoNavigator() {
 
       <Tab.Screen
         name="DemoPodcastList"
-        component={DemoPodcastListScreen}
+        component={Home}
         options={{
           tabBarAccessibilityLabel: translate("demoNavigator.mancuernas"),
           tabBarLabel: translate("demoNavigator.mancuernas"),
@@ -87,7 +88,7 @@ export function DemoNavigator() {
 
       <Tab.Screen
         name="Perfil"
-        component={DemoDebugScreen}
+        component={Profile}
         options={{
           tabBarLabel: "Profile",
           tabBarIcon: ({ focused }) => (
