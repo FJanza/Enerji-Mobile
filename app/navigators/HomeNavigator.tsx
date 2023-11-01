@@ -5,18 +5,16 @@ import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
-import { DemoCommunityScreen, DemoDebugScreen } from "../screens"
+import { DemoDebugScreen } from "../screens"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import Home from "app/screens/Routines/Home"
 import Profile from "app/screens/Profile"
 
 export type DemoTabParamList = {
-  Home: undefined
   Perfil: undefined
-  DemoShowroom: { queryIndex?: string; itemIndex?: string }
-  DemoDebug: undefined
-  DemoPodcastList: undefined
+  PlanAlimenticio: undefined
+  PlanEjercicio: undefined
 }
 
 const logo = require("../../assets/images/logoEnerji.png")
@@ -53,18 +51,7 @@ export function HomeNavigator() {
       }}
     >
       <Tab.Screen
-        name="Home"
-        component={DemoCommunityScreen}
-        options={{
-          tabBarLabel: translate("demoNavigator.home"),
-          tabBarIcon: ({ focused }) => (
-            <Icon icon="home" color={focused && colors.tint} size={30} />
-          ),
-        }}
-      />
-
-      <Tab.Screen
-        name="DemoPodcastList"
+        name="PlanEjercicio"
         component={Home}
         options={{
           tabBarAccessibilityLabel: translate("demoNavigator.mancuernas"),
@@ -76,7 +63,7 @@ export function HomeNavigator() {
       />
 
       <Tab.Screen
-        name="DemoDebug"
+        name="PlanAlimenticio"
         component={DemoDebugScreen}
         options={{
           tabBarLabel: translate("demoNavigator.comida"),

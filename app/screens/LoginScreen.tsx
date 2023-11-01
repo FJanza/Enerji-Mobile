@@ -20,6 +20,7 @@ import { colors, spacing } from "../theme"
 import { layout } from "app/theme/global"
 import { User } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
+import { Picker } from "@react-native-picker/picker"
 import Toast from "react-native-simple-toast"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
@@ -48,17 +49,55 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isAuthCreatePasswordHidden, setIsAuthCreatePasswordHidden] = useState(true)
+  const [dietTypes, setDietTypes] = useState([])
+  const [bodyTypes, setBodyTypes] = useState([])
 
-  const [userRegister, setUserRegister] = useState<Partial<User>>({})
+  const [userRegister, setUserRegister] = useState<Partial<User>>({
+    email: "",
+    password: "",
+    birthDate: "",
+    bodyType: "",
+    height: "",
+    lastName: "",
+    name: "",
+    weight: "",
+  })
   const {
     authenticationStore: { authEmail, setAuthEmail, setAuthToken },
   } = useStores()
+
+  const showAlert = (texto: string) => {
+    Toast.show(texto, Toast.SHORT)
+  }
+
+  const dataForRegister = async () => {
+    const { data: TipoDieta, error: errorTipoDieta } = await supabase
+      .from("TipoDieta")
+      .select("type")
+
+    if (errorTipoDieta?.message) {
+      showAlert(errorTipoDieta.message)
+    } else {
+      setDietTypes(TipoDieta.map((td) => td.type))
+    }
+
+    const { data: TipoCuerpo, error: errorTipoCuerpo } = await supabase
+      .from("TipoCuerpo")
+      .select("tipoCuerpo")
+
+    if (errorTipoCuerpo?.message) {
+      showAlert(errorTipoCuerpo.message)
+    } else {
+      setBodyTypes(TipoCuerpo.map((tc) => tc.tipoCuerpo))
+    }
+  }
 
   useEffect(() => {
     // Here is where you could fetch credentials from keychain or storage
     // and pre-fill the form fields.
     setAuthEmail("")
     setAuthPassword("")
+    dataForRegister()
 
     // Return a "cleanup" function that React will run when the component unmounts
     return () => {
@@ -66,10 +105,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       setAuthEmail("")
     }
   }, [])
-
-  const showAlert = (texto: string) => {
-    Toast.show(texto, Toast.SHORT)
-  }
 
   const login = async () => {
     if (LOGIN_WITH_AUTH) {
@@ -232,6 +267,52 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                         })
                       }
                     />
+                    <View style={{ gap: spacing.xxs }}>
+                      <Text text="Tipo de cuerpo" />
+                      <Picker
+                        style={$picker}
+                        mode="dropdown"
+                        selectedValue={userRegister.dietType}
+                        onValueChange={(itemValue) =>
+                          setUserRegister((prev) => {
+                            return { ...prev, dietType: itemValue }
+                          })
+                        }
+                      >
+                        {bodyTypes.map((td) => {
+                          return <Picker.Item label={td} value={td} key={td} />
+                        })}
+                      </Picker>
+                    </View>
+                    <TextField
+                      label="Altura"
+                      keyboardType="decimal-pad"
+                      placeholder="175 en cm"
+                      placeholderTextColor={"#a3a3a3"}
+                      onChangeText={(e) =>
+                        setUserRegister((prev) => {
+                          return { ...prev, height: e !== "" ? e : undefined }
+                        })
+                      }
+                    />
+                    <View style={{ gap: spacing.xxs }}>
+                      <Text text="Tipo de dieta" />
+                      <Picker
+                        style={$picker}
+                        placeholder="Tipo de cuerpo"
+                        mode="dropdown"
+                        selectedValue={userRegister.bodyType}
+                        onValueChange={(itemValue) =>
+                          setUserRegister((prev) => {
+                            return { ...prev, bodyType: itemValue }
+                          })
+                        }
+                      >
+                        {dietTypes.map((td) => {
+                          return <Picker.Item label={td} value={td} key={td} />
+                        })}
+                      </Picker>
+                    </View>
                     <TextField
                       label="Fecha de nacimiento"
                       placeholder="dd/mm/yyyy"
@@ -247,27 +328,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                         })
                       }
                     />
-                    <TextField
-                      label="Altura"
-                      keyboardType="decimal-pad"
-                      placeholder="175 en cm"
-                      placeholderTextColor={"#a3a3a3"}
-                      onChangeText={(e) =>
-                        setUserRegister((prev) => {
-                          return { ...prev, height: e !== "" ? e : undefined }
-                        })
-                      }
-                    />
-                    <TextField
-                      label="Tipo de cuerpo"
-                      placeholder="Ej: hectomorfo"
-                      placeholderTextColor={"#a3a3a3"}
-                    />
-                    <TextField
-                      label="Tipo de dieta"
-                      placeholder="Ej: 175 en cm"
-                      placeholderTextColor={"#a3a3a3"}
-                    />
                   </View>
                 </ScrollView>
               </SafeAreaView>
@@ -277,7 +337,16 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                   style={$tapButton}
                   preset="reversed"
                   onPress={() => handleRegister()}
-                  disabled={userRegister.email === "" && userRegister.password === ""}
+                  disabled={
+                    userRegister.email !== "" ||
+                    userRegister.password !== "" ||
+                    userRegister.birthDate !== "" ||
+                    userRegister.bodyType !== "" ||
+                    userRegister.height !== "" ||
+                    userRegister.lastName !== "" ||
+                    userRegister.name !== "" ||
+                    userRegister.weight !== ""
+                  }
                 />
                 <Text
                   text="Recuerda que luego de registrarte debe confirmar el proceso con el email que te enviamos"
@@ -292,6 +361,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     </Screen>
   )
 })
+
+const $picker: ViewStyle = {
+  backgroundColor: colors.palette.primary200,
+  borderRadius: 60,
+}
 
 const $cardModal: ViewStyle = {
   backgroundColor: colors.palette.primary700,

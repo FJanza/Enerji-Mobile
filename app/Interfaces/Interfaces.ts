@@ -6,20 +6,6 @@ export interface User {
   birthDate: string
   weight: string
   height: string
-  bodyType: BodyType
+  bodyType: string
   dietType: string
 }
-
-interface BodyType {
-  type: "Ectomorfo" | "Endomorfo" | "Mesomorfo"
-}
-
-// name: undefined
-// lastName: undefined
-// email: undefined
-// password: undefined
-// birthDate: undefined
-// weight: undefined
-// height: undefined
-// bodyType: undefined
-// dietType: undefined
