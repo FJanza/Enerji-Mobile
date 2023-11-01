@@ -152,9 +152,10 @@ export function useNavigationPersistence(storage: Storage, persistenceKey: strin
  * prop. If you have access to the navigation prop, do not use this.
  * @see https://reactnavigation.org/docs/navigating-without-navigation-prop/
  */
-export function navigate(...args: Parameters<typeof navigationRef.navigate>) {
+export function navigate(name: any, params?: any) {
   if (navigationRef.isReady()) {
-    navigationRef.navigate(...args)
+    // @ts-ignore
+    navigationRef.navigate(name as never, params as never)
   }
 }
 

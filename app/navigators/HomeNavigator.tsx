@@ -8,8 +8,8 @@ import { translate } from "../i18n"
 import { DemoDebugScreen } from "../screens"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
-import Home from "app/screens/Routines/Home"
 import Profile from "app/screens/Profile"
+import { RoutinesNavigator } from "./RoutinesNavigator"
 
 export type DemoTabParamList = {
   Perfil: undefined
@@ -52,7 +52,7 @@ export function HomeNavigator() {
     >
       <Tab.Screen
         name="PlanEjercicio"
-        component={Home}
+        component={RoutinesNavigator}
         options={{
           tabBarAccessibilityLabel: translate("demoNavigator.mancuernas"),
           tabBarLabel: translate("demoNavigator.mancuernas"),
