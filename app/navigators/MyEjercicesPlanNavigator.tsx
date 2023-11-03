@@ -3,8 +3,8 @@ import React from "react"
 
 // Navigation
 import { createStackNavigator } from "@react-navigation/stack"
-import MyEjercicesPlans from "app/screens/Routines/MyEjercicesPlans"
-import GeneratorEjercicePlan from "app/screens/Routines/GeneratorEjercicePlan"
+import MyExercisesPlans from "app/screens/Routines/MyExercisesPlans"
+import GeneratorExercisePlan from "app/screens/Routines/GeneratorExercisePlan"
 
 /**
  
@@ -12,14 +12,14 @@ Helper for automatically generating navigation prop types for each route.*
 More info: https://reactnavigation.org/docs/typescript/#organizing-types
 */
 
-export function MyEjercicesPlanNavigator() {
+export function MyExercisesPlanNavigator() {
   const Stack = createStackNavigator()
 
   return (
     <>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="EjercicePlan">
-        <Stack.Screen name="myEjercicesPlans" component={MyEjercicesPlans} />
-        <Stack.Screen name="GeneratorEjercicePlan" component={GeneratorEjercicePlan} />
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ExercisePlan">
+        <Stack.Screen name="myExercisesPlans" component={MyExercisesPlans} />
+        <Stack.Screen name="GeneratorExercisePlan" component={GeneratorExercisePlan} />
       </Stack.Navigator>
     </>
   )

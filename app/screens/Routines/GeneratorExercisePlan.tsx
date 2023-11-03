@@ -1,24 +1,24 @@
-import { Text, StyleSheet } from "react-native"
+import { StyleSheet } from "react-native"
 import React from "react"
-import { Button, Screen } from "app/components"
+import { Button, Screen, Text } from "app/components"
 import { spacing } from "app/theme"
 import { navigate } from "app/navigators"
 
-const GeneratorEjercicePlan = () => {
+const GeneratorExercisePlan = () => {
   return (
     <Screen preset="scroll" contentContainerStyle={styles.container} safeAreaEdges={["top"]}>
       <Text>GeneratorEjercicePlan</Text>
       <Button
         onPress={() => {
-          navigate("myEjercicesPlans")
+          navigate("myExercisesPlans")
         }}
-        text="Mis planes"
+        text="Guardar Plan"
       />
     </Screen>
   )
 }
 
-export default GeneratorEjercicePlan
+export default GeneratorExercisePlan
 
 const styles = StyleSheet.create({
   container: {

@@ -4,7 +4,7 @@ import React from "react"
 // Navigation
 import { createStackNavigator } from "@react-navigation/stack"
 import MyRutines from "app/screens/MyRutines"
-import { MyEjercicesPlanNavigator } from "./MyEjercicesPlanNavigator"
+import { MyExercisesPlanNavigator } from "./MyEjercicesPlanNavigator"
 
 /**
  
@@ -19,7 +19,7 @@ export function RoutinesNavigator() {
     <>
       <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Routines">
         <Stack.Screen name="MyRoutines" component={MyRutines} />
-        <Stack.Screen name="MyEjercicesPlanNavigator" component={MyEjercicesPlanNavigator} />
+        <Stack.Screen name="MyEjercicesPlanNavigator" component={MyExercisesPlanNavigator} />
       </Stack.Navigator>
     </>
   )
