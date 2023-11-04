@@ -5,6 +5,7 @@ import React from "react"
 import { createStackNavigator } from "@react-navigation/stack"
 import MyExercisesPlans from "app/screens/Routines/MyExercisesPlans"
 import GeneratorExercisePlan from "app/screens/Routines/GeneratorExercisePlan"
+import { ROUTES } from "app/utils/routes"
 
 /**
  
@@ -17,9 +18,12 @@ export function MyExercisesPlanNavigator() {
 
   return (
     <>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ExercisePlan">
-        <Stack.Screen name="myExercisesPlans" component={MyExercisesPlans} />
-        <Stack.Screen name="GeneratorExercisePlan" component={GeneratorExercisePlan} />
+      <Stack.Navigator
+        screenOptions={{ headerShown: false }}
+        initialRouteName={ROUTES.MY_EXERCISES_PLANS}
+      >
+        <Stack.Screen name={ROUTES.MY_EXERCISES_PLANS} component={MyExercisesPlans} />
+        <Stack.Screen name={ROUTES.GENERATOR_EXERCISE_PLAN} component={GeneratorExercisePlan} />
       </Stack.Navigator>
     </>
   )

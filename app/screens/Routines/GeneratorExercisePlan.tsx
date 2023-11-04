@@ -3,6 +3,7 @@ import React from "react"
 import { Button, Screen, Text } from "app/components"
 import { spacing } from "app/theme"
 import { navigate } from "app/navigators"
+import { ROUTES } from "app/utils/routes"
 
 const GeneratorExercisePlan = () => {
   return (
@@ -10,7 +11,7 @@ const GeneratorExercisePlan = () => {
       <Text>GeneratorEjercicePlan</Text>
       <Button
         onPress={() => {
-          navigate("myExercisesPlans")
+          navigate(ROUTES.MY_EXERCISES_PLANS)
         }}
         text="Guardar Plan"
       />

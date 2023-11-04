@@ -161,8 +161,8 @@ export function Card(props: CardProps) {
   const $headingStyle = [
     $headingPresets[preset],
     (isFooterPresent || isContentPresent) && { marginBottom: spacing.xxxs },
-    $headingStyleOverride,
     HeadingTextProps?.style,
+    $headingStyleOverride,
   ]
   const $contentStyle = [
     $contentPresets[preset],

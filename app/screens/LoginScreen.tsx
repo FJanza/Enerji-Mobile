@@ -223,7 +223,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
         <View style={layout.Center}>
           <View style={$cardModal}>
             <View style={$bodyModal}>
-              <View style={[layout.rowSpacing, $headingModal]}>
+              <View style={[layout.rowBetween, $headingModal]}>
                 <Text text="Registrate" preset="subheading" />
                 <Pressable onPress={() => setOpenRegisterModal(false)}>
                   <Icon icon="x" color="white" />
