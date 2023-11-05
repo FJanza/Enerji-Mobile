@@ -142,7 +142,7 @@ const $baseTextStyle: TextStyle = {
   flexShrink: 1,
   flexGrow: 0,
   zIndex: 2,
-  color: colors.palette.darker,
+  color: colors.palette.primary700,
 }
 
 const $rightAccessoryStyle: ViewStyle = { marginStart: spacing.xs, zIndex: 1 }
@@ -164,22 +164,51 @@ const $viewPresets = {
     $baseViewStyle,
     { backgroundColor: colors.palette.primary600 },
   ] as StyleProp<ViewStyle>,
+
+  smallDefault: [
+    $baseViewStyle,
+    {
+      borderWidth: 1,
+      borderColor: colors.palette.neutral400,
+      backgroundColor: colors.palette.neutral100,
+      minHeight: 36,
+    },
+  ] as StyleProp<ViewStyle>,
+
+  smallFilled: [
+    $baseViewStyle,
+    { backgroundColor: colors.palette.neutral300, minHeight: 36 },
+  ] as StyleProp<ViewStyle>,
+
+  smallReversed: [
+    $baseViewStyle,
+    { backgroundColor: colors.palette.primary600, minHeight: 36 },
+  ] as StyleProp<ViewStyle>,
 }
 
 const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
   default: $baseTextStyle,
   filled: $baseTextStyle,
   reversed: [$baseTextStyle, { color: colors.palette.neutral100 }],
+  smallDefault: $baseTextStyle,
+  smallFilled: $baseTextStyle,
+  smallReversed: [$baseTextStyle, { color: colors.palette.neutral100 }],
 }
 
 const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
   default: { backgroundColor: colors.palette.neutral200 },
   filled: { backgroundColor: colors.palette.neutral400 },
   reversed: { backgroundColor: colors.palette.neutral700 },
+  smallDefault: { backgroundColor: colors.palette.neutral200 },
+  smallFilled: { backgroundColor: colors.palette.neutral400 },
+  smallReversed: { backgroundColor: colors.palette.neutral700 },
 }
 
 const $pressedTextPresets: Record<Presets, StyleProp<TextStyle>> = {
   default: { opacity: 0.9 },
   filled: { opacity: 0.9 },
   reversed: { opacity: 0.9 },
+  smallDefault: { opacity: 0.9 },
+  smallFilled: { opacity: 0.9 },
+  smallReversed: { opacity: 0.9 },
 }

@@ -10372,6 +10372,11 @@ react-native-codegen@^0.71.5:
     jscodeshift "^0.14.0"
     nullthrows "^1.1.1"
 
+react-native-collapsible@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/react-native-collapsible/-/react-native-collapsible-1.6.1.tgz#27e289831a6955aebde98abff2424a7710f36f02"
+  integrity sha512-orF4BeiXd2hZW7fu9YcqIJXzN6TJcFcddY807D3MAOVktLuW9oQ+RIkrTJ5DR3v9ZOFfREkOjEmS79qeUTvkBQ==
+
 react-native-date-picker@^4.3.3:
   version "4.3.3"
   resolved "https://registry.yarnpkg.com/react-native-date-picker/-/react-native-date-picker-4.3.3.tgz#5ca4ca10283538ab9307b7f2dc6b83233ded122b"

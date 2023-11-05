@@ -24,7 +24,9 @@ export interface Exersice {
 }
 export interface ExercisePlan {
   id: string
+  title: string
   routine: Exersice[]
   startDate: Date
   endDate: Date
+  duration: number
 }

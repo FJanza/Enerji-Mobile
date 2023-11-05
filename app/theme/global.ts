@@ -7,6 +7,7 @@ const layout = StyleSheet.create({
   fillCenter: { alignItems: "center", flex: 1, justifyContent: "center" },
   row: { flexDirection: "row" },
   rowBetween: { flexDirection: "row", justifyContent: "space-between" },
+  rowBetweenCenter: { alignItems: "center", flexDirection: "row", justifyContent: "space-between" },
 })
 
 export { layout }

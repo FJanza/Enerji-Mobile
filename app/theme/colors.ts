@@ -34,6 +34,10 @@ const palette = {
   angry100: "#F2D6CD",
   angry500: "#C03403",
 
+  quiet100: "#D2F6CD",
+  quiet300: "#00cc11",
+  quiet500: "#34C003",
+
   overlay20: "rgba(25, 16, 21, 0.2)",
   overlay50: "rgba(25, 16, 21, 0.5)",
 } as const
