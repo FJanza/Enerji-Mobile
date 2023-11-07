@@ -94,6 +94,7 @@ export function Button(props: ButtonProps) {
       $viewPresets[preset],
       $viewStyleOverride,
       !!pressed && [$pressedViewPresets[preset], $pressedViewStyleOverride],
+      rest.disabled && $viewPresets.disabled,
     ]
   }
   function $textStyle({ pressed }) {
@@ -149,6 +150,11 @@ const $rightAccessoryStyle: ViewStyle = { marginStart: spacing.xs, zIndex: 1 }
 const $leftAccessoryStyle: ViewStyle = { marginEnd: spacing.xs, zIndex: 1 }
 
 const $viewPresets = {
+  disabled: [
+    $baseViewStyle,
+    { backgroundColor: colors.palette.neutral500 },
+  ] as StyleProp<ViewStyle>,
+
   default: [
     $baseViewStyle,
     {
@@ -193,6 +199,7 @@ const $textPresets: Record<Presets, StyleProp<TextStyle>> = {
   smallDefault: $baseTextStyle,
   smallFilled: $baseTextStyle,
   smallReversed: [$baseTextStyle, { color: colors.palette.neutral100 }],
+  disabled: $baseTextStyle,
 }
 
 const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
@@ -202,6 +209,7 @@ const $pressedViewPresets: Record<Presets, StyleProp<ViewStyle>> = {
   smallDefault: { backgroundColor: colors.palette.neutral200 },
   smallFilled: { backgroundColor: colors.palette.neutral400 },
   smallReversed: { backgroundColor: colors.palette.neutral700 },
+  disabled: { backgroundColor: colors.palette.neutral200 },
 }
 
 const $pressedTextPresets: Record<Presets, StyleProp<TextStyle>> = {
@@ -211,4 +219,5 @@ const $pressedTextPresets: Record<Presets, StyleProp<TextStyle>> = {
   smallDefault: { opacity: 0.9 },
   smallFilled: { opacity: 0.9 },
   smallReversed: { opacity: 0.9 },
+  disabled: { opacity: 0.9 },
 }

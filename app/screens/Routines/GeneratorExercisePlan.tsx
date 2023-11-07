@@ -14,12 +14,13 @@ import { planDummys } from "./MyExercisesPlans"
 const trainingTypes = ["Hipertrofia", "cardio"]
 
 const GeneratorExercisePlan = () => {
-  const [tipoDeEntrenamiento, setTipoDeEntrenamiento] = useState()
-  const [duracion, setDuracion] = useState<string>()
-  const [planGenerado, setPlanGenerado] = useState<ExercisePlan>(undefined)
+  const [trainingType, setTrainingType] = useState()
+  const [duration, setDuration] = useState<string>()
+  const [planGenerated, setPlanGenerated] = useState<ExercisePlan>(undefined)
+  const [daysOfWeek, setDaysOfWeek] = useState([])
 
   const handleGeneratePlan = () => {
-    setPlanGenerado(planDummys[0])
+    setPlanGenerated(planDummys[0])
   }
   return (
     <Screen
@@ -36,11 +37,11 @@ const GeneratorExercisePlan = () => {
           <View style={styles.trainingTypesSelectContainer}>
             <Picker
               mode="dropdown"
-              selectedValue={tipoDeEntrenamiento}
+              selectedValue={trainingType}
               style={{
                 backgroundColor: colors.palette.primary100,
               }}
-              onValueChange={(itemValue) => setTipoDeEntrenamiento(itemValue)}
+              onValueChange={(itemValue) => setTrainingType(itemValue)}
             >
               {trainingTypes.map((td) => {
                 return <Picker.Item label={td} value={td} key={td} />
@@ -56,31 +57,32 @@ const GeneratorExercisePlan = () => {
           <View>
             <TextField
               keyboardType="decimal-pad"
-              value={duracion}
+              value={duration}
               onChangeText={(e) => {
-                setDuracion(e)
+                setDuration(e)
               }}
             />
           </View>
         </View>
-        <View>
+        <View style={{ gap: spacing.xxs }}>
           <Text text="Seleccionar dias de la semana" preset="invertBold" />
           <SelectDays
             onDaysChanges={(days) => {
-              console.log(days)
+              setDaysOfWeek(days)
             }}
           />
         </View>
         <Button
-          text="Generar"
-          preset="smallReversed"
+          disabled={trainingType === "" || duration === "" || daysOfWeek.length === 0}
+          text="Generar Plan"
+          preset="reversed"
           onPress={() => {
             handleGeneratePlan()
           }}
         />
       </View>
 
-      {planGenerado && <PlanDisplay plan={planGenerado} showDeleteButton={false} />}
+      {planGenerated && <PlanDisplay plan={planGenerated} showDeleteButton={false} />}
 
       <Button
         // falta handler que sume el plan a la db y al redux
@@ -110,5 +112,5 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
   },
   trainingTypesContainer: { gap: spacing.xxs },
-  trainingTypesSelectContainer: { borderColor: "grey", borderWidth: 0.5 },
+  trainingTypesSelectContainer: { borderColor: colors.palette.neutral500, borderWidth: 0.5 },
 })
