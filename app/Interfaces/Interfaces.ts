@@ -35,3 +35,16 @@ export interface ExercisePlan {
   endDate: Date
   duration: number
 }
+
+export const TRADUCTIONS = {
+  email: "email",
+  password: "contraseña",
+  birthDate: "fecha de cumpleaños",
+  bodyType: "tipo de cuerpo",
+  height: "altura",
+  lastName: "apellido",
+  name: "nombre",
+  weight: "peso",
+  objective: "objetivo",
+  dietType: "tipo de dieta",
+}

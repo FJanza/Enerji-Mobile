@@ -44,9 +44,9 @@ const dummyPersonalInformation: User = {
   lastName: "Janza",
   height: 120,
   weight: 63,
-  objective: "Hipertrofia",
+  objective: "volumen",
   bodyType: "ectomorfo",
-  dietType: "equilibrada",
+  dietType: "Equilibrada",
 }
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
@@ -303,7 +303,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       placeholderTextColor={"#a3a3a3"}
                       onChangeText={(e) =>
                         setUserRegister((prev) => {
-                          return { ...prev, heigth: e !== "" ? e : undefined }
+                          return { ...prev, height: Number(e) }
                         })
                       }
                     />
@@ -336,7 +336,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       placeholderTextColor={"#a3a3a3"}
                       onChangeText={(e) =>
                         setUserRegister((prev) => {
-                          return { ...prev, weigth: e !== "" ? e : undefined }
+                          return { ...prev, weight: Number(e) }
                         })
                       }
                     />

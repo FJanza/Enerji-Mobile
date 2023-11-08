@@ -1,3 +1,4 @@
+import { logOut } from "app/store/user"
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 
 export const AuthenticationStoreModel = types
@@ -28,6 +29,7 @@ export const AuthenticationStoreModel = types
     logout() {
       store.authToken = undefined
       store.authEmail = ""
+      logOut()
     },
   }))
 

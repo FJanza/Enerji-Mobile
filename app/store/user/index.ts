@@ -6,8 +6,8 @@ type PersonalInformation = {
   name: string
   surName?: string
   lastName: string
-  heigth: number
-  weigth: number
+  height: number
+  weight: number
   objective: string
   bodyType: string
   dietType: string
@@ -25,8 +25,8 @@ const stateInit: User = {
     birthDate: "",
     name: "",
     lastName: "",
-    heigth: 0,
-    weigth: 0,
+    height: 0,
+    weight: 0,
     objective: "",
     bodyType: "",
     dietType: "",
@@ -47,8 +47,8 @@ const slice = createSlice({
         birthDate: "",
         name: "",
         lastName: "",
-        heigth: 0,
-        weigth: 0,
+        height: 0,
+        weight: 0,
         objective: "",
         bodyType: "",
         dietType: "",
