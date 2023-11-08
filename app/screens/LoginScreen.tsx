@@ -18,10 +18,13 @@ import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 // import { useDispatch } from "react-redux"
 import { layout } from "app/theme/global"
-import { User } from "app/Interfaces/Interfaces"
+import { User, UserRegistration } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
 import Toast from "react-native-simple-toast"
+import { useDispatch } from "react-redux"
+
+import { setUser } from "app/store/user"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
@@ -34,15 +37,20 @@ const windowHeight = Dimensions.get("window").height
 const LOGIN_WITH_AUTH = true
 // TODO pasar a env
 
-export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
-  // const definitions = {
-  //   Ectomorfo: "Delgado, con poca grasa y poco músculo. Tienen problemas para ganar peso.",
-  //   Endomorfo:
-  //     "Mucha grasa y músculo, con una forma corporal más redonda que la de los ectomorfos. Ganan peso fácilmente.",
-  //   Mesomorfo: "Atlético y musculoso, estos individuos ganan y pierden peso fácilmente.",
-  // }
+const dummyPersonalInformation: User = {
+  email: "thebonitagamer777rexomg@gmail.com",
+  birthDate: "13/11/2014",
+  name: "Bonita",
+  lastName: "Janza",
+  height: 120,
+  weight: 63,
+  objective: "Hipertrofia",
+  bodyType: "ectomorfo",
+  dietType: "equilibrada",
+}
 
-  // const distpach = useDispatch()
+export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
+  const dispatch = useDispatch()
 
   const authPasswordInput = useRef<TextInput>()
   const [openRegisterModal, setOpenRegisterModal] = useState(false)
@@ -52,15 +60,17 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const [dietTypes, setDietTypes] = useState([])
   const [bodyTypes, setBodyTypes] = useState([])
 
-  const [userRegister, setUserRegister] = useState<Partial<User>>({
+  const [userRegister, setUserRegister] = useState<Partial<UserRegistration>>({
     email: "",
     password: "",
     birthDate: "",
     bodyType: "",
-    height: "",
+    height: 0,
     lastName: "",
     name: "",
-    weight: "",
+    weight: 0,
+    objective: "",
+    dietType: "",
   })
   const {
     authenticationStore: { authEmail, setAuthEmail, setAuthToken },
@@ -120,10 +130,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       } else {
         setAuthPassword("")
         setAuthEmail("")
+        // TODO traer informacion de tabla UserPersonalInformation
+        dispatch(setUser({ personalInformation: { ...dummyPersonalInformation } }))
         setAuthToken(data.session.access_token)
       }
     } else {
-      setAuthToken("aaaaaaaaaaaaaaaaaaaa")
+      setAuthToken("a")
     }
   }
 
@@ -291,7 +303,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       placeholderTextColor={"#a3a3a3"}
                       onChangeText={(e) =>
                         setUserRegister((prev) => {
-                          return { ...prev, height: e !== "" ? e : undefined }
+                          return { ...prev, heigth: e !== "" ? e : undefined }
                         })
                       }
                     />
@@ -324,7 +336,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       placeholderTextColor={"#a3a3a3"}
                       onChangeText={(e) =>
                         setUserRegister((prev) => {
-                          return { ...prev, weight: e !== "" ? e : undefined }
+                          return { ...prev, weigth: e !== "" ? e : undefined }
                         })
                       }
                     />
@@ -342,10 +354,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                     userRegister.password !== "" ||
                     userRegister.birthDate !== "" ||
                     userRegister.bodyType !== "" ||
-                    userRegister.height !== "" ||
+                    userRegister.height !== 0 ||
                     userRegister.lastName !== "" ||
                     userRegister.name !== "" ||
-                    userRegister.weight !== ""
+                    userRegister.weight !== 0
                   }
                 />
                 <Text
