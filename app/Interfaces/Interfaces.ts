@@ -1,13 +1,18 @@
 export interface User {
   name: string
+  surname?: string
   lastName: string
   email: string
-  password: string
   birthDate: string
-  weight: string
-  height: string
+  weight: number
+  height: number
   bodyType: string
   dietType: string
+  objective: string
+}
+
+export interface UserRegistration extends User {
+  password: string
 }
 
 export interface Routine {}
@@ -29,4 +34,17 @@ export interface ExercisePlan {
   startDate: Date
   endDate: Date
   duration: number
+}
+
+export const TRADUCTIONS = {
+  email: "email",
+  password: "contraseña",
+  birthDate: "fecha de cumpleaños",
+  bodyType: "tipo de cuerpo",
+  height: "altura",
+  lastName: "apellido",
+  name: "nombre",
+  weight: "peso",
+  objective: "objetivo",
+  dietType: "tipo de dieta",
 }

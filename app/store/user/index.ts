@@ -2,38 +2,34 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 type PersonalInformation = {
   email: string
-  birthDate: number
+  birthDate: string
   name: string
   surName?: string
   lastName: string
-}
-
-type PhysicalInformation = {
-  heigth: number
-  weigth: number
+  height: number
+  weight: number
   objective: string
+  bodyType: string
+  dietType: string
 }
 
 type User = {
   authToken?: string
-  dni: number
   personalInformation: PersonalInformation
-  physicalInformation: PhysicalInformation
 }
 
 const stateInit: User = {
   authToken: undefined,
-  dni: 0,
   personalInformation: {
     email: "",
-    birthDate: 0,
+    birthDate: "",
     name: "",
     lastName: "",
-  },
-  physicalInformation: {
-    heigth: 0,
-    weigth: 0,
+    height: 0,
+    weight: 0,
     objective: "",
+    bodyType: "",
+    dietType: "",
   },
 }
 
@@ -46,30 +42,24 @@ const slice = createSlice({
     },
     logOut(state) {
       state.authToken = undefined
-      state.dni = 0
       state.personalInformation = {
         email: "",
-        birthDate: 0,
+        birthDate: "",
         name: "",
         lastName: "",
-      }
-      state.physicalInformation = {
-        heigth: 0,
-        weigth: 0,
+        height: 0,
+        weight: 0,
         objective: "",
+        bodyType: "",
+        dietType: "",
       }
     },
     setUser: (state, action: PayloadAction<Partial<User>>) => {
       const newState = {
         ...state,
-        dni: action.payload.dni,
         personalInformation: {
           ...state.personalInformation,
           ...action.payload.personalInformation,
-        },
-        physicalInformation: {
-          ...state.physicalInformation,
-          ...action.payload.physicalInformation,
         },
       }
       return newState
@@ -77,6 +67,6 @@ const slice = createSlice({
   },
 })
 
-export const { setUser } = slice.actions
+export const { setUser, setAuthToken, logOut } = slice.actions
 
 export default slice.reducer
