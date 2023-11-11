@@ -8,11 +8,11 @@ import Toast from "react-native-simple-toast"
 import { supabase } from "app/services/supabaseService"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "app/store"
-import { TRADUCTIONS, User } from "app/Interfaces/Interfaces"
+import { TRADUCTIONS } from "app/Interfaces/Interfaces"
 import { capitalizeString } from "app/utils/text"
 import { layout } from "app/theme/global"
 import { Picker } from "@react-native-picker/picker"
-import { setUser } from "app/store/user"
+import { updateUser } from "app/store/user"
 
 const showAlert = (texto: string) => {
   Toast.show(texto, Toast.SHORT)
@@ -22,14 +22,12 @@ const Profile = () => {
   const { personalInformation } = useSelector((state: RootState) => state.user)
 
   const [dietTypes, setDietTypes] = useState([])
-
-  const [objetives, setObjetives] = useState([])
+  const [bodyTypes, setBodyTypes] = useState([])
 
   const personalAttr = Object.entries(personalInformation)
 
-  const [personalInformationEdit, setPersonalInformationEdit] = useState<Partial<User>>({
-    weight: personalInformation.weight,
-    objective: personalInformation.objective,
+  const [personalInformationEdit, setPersonalInformationEdit] = useState({
+    weight: String(personalInformation.weight),
     dietType: personalInformation.dietType,
   })
 
@@ -48,8 +46,24 @@ const Profile = () => {
   }
 
   const handleSaveData = async () => {
-    dispatch(setUser(personalInformationEdit))
+    dispatch(
+      updateUser({
+        weigth: Number(personalInformationEdit.weight),
+        dietType: personalInformationEdit.dietType,
+      }),
+    )
     // TODO agregar el subir cambios a db en supabase
+    const { error } = await supabase
+      .from("UserPersonalInformation")
+      .update({
+        peso: Number(personalInformationEdit.weight),
+        id_tipoDeDieta: dietTypes.indexOf(personalInformationEdit.dietType),
+      })
+      .eq("email", personalAttr[0][1])
+
+    if (error?.message) {
+      showAlert(error.message)
+    }
   }
 
   const dataForRegister = async () => {
@@ -63,45 +77,62 @@ const Profile = () => {
       setDietTypes(TipoDieta.map((td) => td.type))
     }
 
-    const { data: tipoObjetivo, error: errorTipoObjetivo } = await supabase
-      .from("Objetivos")
-      .select("tipoObjetivo")
+    const { data: TipoCuerpo, error: errorTipoCuerpo } = await supabase
+      .from("TipoCuerpo")
+      .select("tipoCuerpo")
 
-    if (errorTipoObjetivo?.message) {
-      showAlert(errorTipoObjetivo.message)
+    if (errorTipoCuerpo?.message) {
+      showAlert(errorTipoCuerpo.message)
     } else {
-      setObjetives(tipoObjetivo.map((td) => td.tipoObjetivo))
+      setBodyTypes(TipoCuerpo.map((tc) => tc.tipoCuerpo))
     }
   }
 
   useEffect(() => {
     dataForRegister()
-    console.log(personalInformation)
+    console.log(personalAttr)
     console.log(personalInformationEdit)
   }, [personalInformationEdit])
 
   return (
-    <Screen preset="scroll" contentContainerStyle={styles.container} safeAreaEdges={["top"]}>
+    <Screen
+      preset="scroll"
+      contentContainerStyle={styles.container}
+      safeAreaEdges={["top"]}
+      statusBarStyle="light"
+    >
       <Text text="Tus Datos" preset="heading" />
       <View style={styles.attributes}>
         {personalAttr.map((attr, i) => {
-          return (
-            attr[0] !== "weight" &&
-            attr[0] !== "objective" &&
-            attr[0] !== "dietType" && (
-              <View key={i}>
-                <Text text={`${capitalizeString(TRADUCTIONS[attr[0]])}:`} preset="formLabel" />
-                <View style={layout.row}>
-                  <Text text={`${attr[1]}`} />
-                  <Text text={`${attr[0] === "height" ? "cm" : ""}`} />
+          if (i > 0) {
+            return (
+              attr[0] !== "weight" &&
+              attr[0] !== "dietType" && (
+                <View key={i}>
+                  <Text text={`${capitalizeString(TRADUCTIONS[attr[0]])}:`} preset="formLabel" />
+                  <View style={layout.row}>
+                    <Text text={`${attr[0] === "bodyType" ? bodyTypes[attr[1]] : attr[1]}`} />
+                    <Text text={`${attr[0] === "height" ? "cm" : ""}`} />
+                  </View>
                 </View>
-              </View>
+              )
             )
-          )
+          } else {
+            return undefined
+          }
         })}
         <View>
           <Text text={"Peso (Kg):"} />
-          <TextField value={String(personalInformationEdit.weight)} />
+          <TextField
+            keyboardType="number-pad"
+            value={String(personalInformationEdit.weight)}
+            onChangeText={(e) => {
+              !e.includes(",") &&
+                setPersonalInformationEdit((prev) => {
+                  return { ...prev, weight: e }
+                })
+            }}
+          />
         </View>
 
         <View style={{ gap: spacing.xxxs }}>
@@ -117,24 +148,6 @@ const Profile = () => {
             }
           >
             {dietTypes.map((td) => {
-              return <Picker.Item label={td} value={td} key={td} />
-            })}
-          </Picker>
-        </View>
-
-        <View style={{ gap: spacing.xxxs }}>
-          <Text text="Objetivo:" />
-          <Picker
-            style={styles.picker}
-            mode="dropdown"
-            selectedValue={personalInformationEdit.objective}
-            onValueChange={(itemValue) =>
-              setPersonalInformationEdit((prev) => {
-                return { ...prev, objective: itemValue }
-              })
-            }
-          >
-            {objetives.map((td) => {
               return <Picker.Item label={td} value={td} key={td} />
             })}
           </Picker>

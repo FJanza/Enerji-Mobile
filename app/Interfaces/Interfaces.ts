@@ -8,7 +8,7 @@ export interface User {
   height: number
   bodyType: string
   dietType: string
-  objective: string
+  sex: "Masculino" | "Femenino"
 }
 
 export interface UserRegistration extends User {
@@ -39,7 +39,7 @@ export interface ExercisePlan {
 export const TRADUCTIONS = {
   email: "email",
   password: "contraseña",
-  birthDate: "fecha de cumpleaños",
+  birthDate: "fecha de nacimiento",
   bodyType: "tipo de cuerpo",
   height: "altura",
   lastName: "apellido",
@@ -47,4 +47,5 @@ export const TRADUCTIONS = {
   weight: "peso",
   objective: "objetivo",
   dietType: "tipo de dieta",
+  sex: "sexo",
 }

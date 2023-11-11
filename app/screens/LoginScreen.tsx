@@ -18,13 +18,16 @@ import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 // import { useDispatch } from "react-redux"
 import { layout } from "app/theme/global"
-import { User, UserRegistration } from "app/Interfaces/Interfaces"
+import { UserRegistration } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
 import Toast from "react-native-simple-toast"
 import { useDispatch } from "react-redux"
 
 import { setUser } from "app/store/user"
+import DatePicker from "react-native-date-picker"
+import moment from "moment"
+import { capitalizeString } from "app/utils/text"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
@@ -37,16 +40,30 @@ const windowHeight = Dimensions.get("window").height
 const LOGIN_WITH_AUTH = true
 // TODO pasar a env
 
-const dummyPersonalInformation: User = {
-  email: "thebonitagamer777rexomg@gmail.com",
-  birthDate: "13/11/2014",
-  name: "Bonita",
-  lastName: "Janza",
-  height: 120,
-  weight: 63,
-  objective: "volumen",
-  bodyType: "ectomorfo",
-  dietType: "Equilibrada",
+// const dummyPersonalInformation: User = {
+//   email: "thebonitagamer777rexomg@gmail.com",
+//   birthDate: "13/11/2014",
+//   name: "Bonita",
+//   lastName: "Janza",
+//   height: 120,
+//   weight: 63,
+//   objective: "volumen",
+//   bodyType: "ectomorfo",
+//   dietType: "Equilibrada",
+//   sex: "female",
+// }
+
+const initialUserRegistration: Partial<UserRegistration> = {
+  email: "",
+  password: "",
+  birthDate: "",
+  bodyType: "",
+  height: 0,
+  lastName: "",
+  name: "",
+  weight: 0,
+  dietType: "",
+  sex: "Femenino",
 }
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
@@ -59,19 +76,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const [isAuthCreatePasswordHidden, setIsAuthCreatePasswordHidden] = useState(true)
   const [dietTypes, setDietTypes] = useState([])
   const [bodyTypes, setBodyTypes] = useState([])
+  const [openDatePicker, setOpenDatePicker] = useState(false)
+  const [birthDate, setBirthDate] = useState<Date>(new Date())
 
-  const [userRegister, setUserRegister] = useState<Partial<UserRegistration>>({
-    email: "",
-    password: "",
-    birthDate: "",
-    bodyType: "",
-    height: 0,
-    lastName: "",
-    name: "",
-    weight: 0,
-    objective: "",
-    dietType: "",
-  })
+  const [userRegister, setUserRegister] =
+    useState<Partial<UserRegistration>>(initialUserRegistration)
+
   const {
     authenticationStore: { authEmail, setAuthEmail, setAuthToken },
   } = useStores()
@@ -103,6 +113,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }
 
   useEffect(() => {
+    console.log({
+      userRegister,
+    })
+
     // Here is where you could fetch credentials from keychain or storage
     // and pre-fill the form fields.
     setAuthEmail("")
@@ -131,8 +145,22 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
         setAuthPassword("")
         setAuthEmail("")
         // TODO traer informacion de tabla UserPersonalInformation
-        dispatch(setUser({ personalInformation: { ...dummyPersonalInformation } }))
-        setAuthToken(data.session.access_token)
+        const { data: UserPersonalInformation, error: errorDataBase } = await supabase
+          .from("UserPersonalInformation")
+          .select(
+            "email, birthDate:fechaNacimiento, name:nombre, lastName:apellido, height:altura, weight:peso, sex:sexo, bodyType:id_tipoDeCuerpo, dietType:id_tipoDeDieta",
+          )
+          .eq("email", authEmail)
+
+        if (errorDataBase?.message) {
+          console.log(errorDataBase.message)
+        } else {
+          console.log("***********************************************")
+          console.log(UserPersonalInformation)
+          console.log("***********************************************")
+          dispatch(setUser({ personalInformation: { ...UserPersonalInformation[0] } }))
+          setAuthToken(data.session.access_token)
+        }
       }
     } else {
       setAuthToken("a")
@@ -154,6 +182,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       },
     [isAuthPasswordHidden],
   )
+
   const CreatePasswordRightAccessory = useMemo(
     () =>
       function PasswordRightAccessory(props: TextFieldAccessoryProps) {
@@ -176,7 +205,26 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       password: userRegister.password,
     })
     console.log({ data, error })
+
+    const { error: errorData } = await supabase.from("UserPersonalInformation").insert([
+      {
+        email: userRegister.email,
+        fechaNacimiento: moment(userRegister.birthDate, "DD/MM/yyyy").toDate(),
+        nombre: capitalizeString(userRegister.name),
+        apellido: capitalizeString(userRegister.lastName),
+        altura: userRegister.height,
+        peso: userRegister.weight,
+        sexo: userRegister.sex,
+        id_tipoDeCuerpo: bodyTypes.indexOf(userRegister.bodyType),
+        id_tipoDeDieta: dietTypes.indexOf(userRegister.dietType),
+      },
+    ])
+    if (errorData?.message) {
+      console.log(errorData.message)
+    }
+
     setOpenRegisterModal(false)
+    setUserRegister(initialUserRegistration)
   }
 
   return (
@@ -184,6 +232,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       preset="auto"
       contentContainerStyle={$screenContentContainer}
       safeAreaEdges={["top", "bottom"]}
+      statusBarStyle="light"
     >
       <Image style={$logo} source={logo} resizeMode="contain" />
       <View>
@@ -237,7 +286,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             <View style={$bodyModal}>
               <View style={[layout.rowBetween, $headingModal]}>
                 <Text text="Registrate" preset="subheading" />
-                <Pressable onPress={() => setOpenRegisterModal(false)}>
+                <Pressable
+                  onPress={() => {
+                    setOpenRegisterModal(false)
+                    setUserRegister(initialUserRegistration)
+                  }}
+                >
                   <Icon icon="x" color="white" />
                 </Pressable>
               </View>
@@ -284,16 +338,34 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       <Picker
                         style={$picker}
                         mode="dropdown"
-                        selectedValue={userRegister.dietType}
+                        selectedValue={userRegister.bodyType}
                         onValueChange={(itemValue) =>
                           setUserRegister((prev) => {
-                            return { ...prev, dietType: itemValue }
+                            return { ...prev, bodyType: itemValue }
                           })
                         }
                       >
                         {bodyTypes.map((td) => {
-                          return <Picker.Item label={td} value={td} key={td} />
+                          return <Picker.Item label={capitalizeString(td)} value={td} key={td} />
                         })}
+                      </Picker>
+                    </View>
+                    <View style={{ gap: spacing.xxs }}>
+                      <Text text="Sexo" />
+                      <Picker
+                        style={$picker}
+                        mode="dropdown"
+                        selectedValue={userRegister.sex}
+                        onValueChange={(itemValue) =>
+                          itemValue === "Masculino" || itemValue === "Femenino"
+                            ? setUserRegister((prev) => {
+                                return { ...prev, sex: itemValue }
+                              })
+                            : null
+                        }
+                      >
+                        <Picker.Item label={"Masculino"} value={"Masculino"} />
+                        <Picker.Item label={"Femenino"} value={"Femenino"} />
                       </Picker>
                     </View>
                     <TextField
@@ -311,27 +383,58 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       <Text text="Tipo de dieta" />
                       <Picker
                         style={$picker}
-                        placeholder="Tipo de cuerpo"
+                        placeholder="Tipo de dieta"
                         mode="dropdown"
-                        selectedValue={userRegister.bodyType}
+                        selectedValue={userRegister.dietType}
                         onValueChange={(itemValue) =>
                           setUserRegister((prev) => {
-                            return { ...prev, bodyType: itemValue }
+                            return { ...prev, dietType: itemValue }
                           })
                         }
                       >
                         {dietTypes.map((td) => {
-                          return <Picker.Item label={td} value={td} key={td} />
+                          return <Picker.Item label={capitalizeString(td)} value={td} key={td} />
                         })}
                       </Picker>
                     </View>
-                    <TextField
-                      label="Fecha de nacimiento"
-                      placeholder="dd/mm/yyyy"
-                      placeholderTextColor={"#a3a3a3"}
-                    />
+                    <View>
+                      <Text text="Fecha de nacimiento" />
+                      <Pressable
+                        onPress={() => {
+                          setOpenDatePicker(true)
+                        }}
+                      >
+                        <Text
+                          text={`${moment(birthDate).format("DD/MM/yyyy")}`}
+                          preset="invertDefault"
+                          style={{
+                            backgroundColor: colors.palette.primary200,
+                            padding: spacing.xs,
+                            borderRadius: spacing.xxs,
+                          }}
+                        />
+                      </Pressable>
+                      <DatePicker
+                        title="Select date"
+                        modal
+                        open={openDatePicker}
+                        date={birthDate}
+                        onConfirm={(date) => {
+                          setBirthDate(date)
+                          setUserRegister((prev) => {
+                            return { ...prev, birthDate: moment(date).format("DD/MM/yyyy") }
+                          })
+                          setOpenDatePicker(false)
+                        }}
+                        onCancel={() => {
+                          setOpenDatePicker(false)
+                        }}
+                        mode="date"
+                      />
+                    </View>
                     <TextField
                       label="Peso"
+                      keyboardType="decimal-pad"
                       placeholder="Ej: 76 en Kg"
                       placeholderTextColor={"#a3a3a3"}
                       onChangeText={(e) =>
@@ -350,14 +453,14 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                   preset="reversed"
                   onPress={() => handleRegister()}
                   disabled={
-                    userRegister.email !== "" ||
-                    userRegister.password !== "" ||
-                    userRegister.birthDate !== "" ||
-                    userRegister.bodyType !== "" ||
-                    userRegister.height !== 0 ||
-                    userRegister.lastName !== "" ||
-                    userRegister.name !== "" ||
-                    userRegister.weight !== 0
+                    userRegister.email === "" ||
+                    userRegister.password === "" ||
+                    userRegister.birthDate === "" ||
+                    userRegister.bodyType === "" ||
+                    userRegister.height === 0 ||
+                    userRegister.lastName === "" ||
+                    userRegister.name === "" ||
+                    userRegister.weight === 0
                   }
                 />
                 <Text

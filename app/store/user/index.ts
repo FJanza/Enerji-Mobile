@@ -8,7 +8,6 @@ type PersonalInformation = {
   lastName: string
   height: number
   weight: number
-  objective: string
   bodyType: string
   dietType: string
 }
@@ -27,7 +26,6 @@ const stateInit: User = {
     lastName: "",
     height: 0,
     weight: 0,
-    objective: "",
     bodyType: "",
     dietType: "",
   },
@@ -49,12 +47,11 @@ const slice = createSlice({
         lastName: "",
         height: 0,
         weight: 0,
-        objective: "",
         bodyType: "",
         dietType: "",
       }
     },
-    setUser: (state, action: PayloadAction<Partial<User>>) => {
+    updateUser: (state, action: PayloadAction<Partial<User>>) => {
       const newState = {
         ...state,
         personalInformation: {
@@ -64,9 +61,18 @@ const slice = createSlice({
       }
       return newState
     },
+    setUser: (state, action: PayloadAction<Partial<User>>) => {
+      const newState = {
+        ...state,
+        personalInformation: {
+          ...action.payload.personalInformation,
+        },
+      }
+      return newState
+    },
   },
 })
 
-export const { setUser, setAuthToken, logOut } = slice.actions
+export const { updateUser, setUser, setAuthToken, logOut } = slice.actions
 
 export default slice.reducer
