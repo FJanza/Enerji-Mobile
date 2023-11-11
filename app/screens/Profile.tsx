@@ -13,6 +13,7 @@ import { capitalizeString } from "app/utils/text"
 import { layout } from "app/theme/global"
 import { Picker } from "@react-native-picker/picker"
 import { updateUser } from "app/store/user"
+import { Skeleton } from "@rneui/themed"
 
 const showAlert = (texto: string) => {
   Toast.show(texto, Toast.SHORT)
@@ -26,10 +27,13 @@ const Profile = () => {
 
   const personalAttr = Object.entries(personalInformation)
 
-  const [personalInformationEdit, setPersonalInformationEdit] = useState({
-    weight: String(personalInformation.weight),
-    dietType: personalInformation.dietType,
-  })
+  const [weight, setWeight] = useState(String(personalInformation.weight))
+
+  const [dietType, setDietType] = useState()
+
+  const [guardandoCambios, setGuardandoCambios] = useState(false)
+
+  const [loadingInfo, setLoadingInfo] = useState(true)
 
   const dispatch = useDispatch()
 
@@ -46,20 +50,23 @@ const Profile = () => {
   }
 
   const handleSaveData = async () => {
+    setGuardandoCambios(true)
     dispatch(
       updateUser({
-        weigth: Number(personalInformationEdit.weight),
-        dietType: personalInformationEdit.dietType,
+        weigth: Number(weight),
+        dietType: dietTypes.indexOf(dietType),
       }),
     )
     // TODO agregar el subir cambios a db en supabase
     const { error } = await supabase
       .from("UserPersonalInformation")
       .update({
-        peso: Number(personalInformationEdit.weight),
-        id_tipoDeDieta: dietTypes.indexOf(personalInformationEdit.dietType),
+        peso: Number(weight),
+        id_tipoDeDieta: dietTypes.indexOf(dietType),
       })
       .eq("email", personalAttr[0][1])
+
+    setGuardandoCambios(false)
 
     if (error?.message) {
       showAlert(error.message)
@@ -86,13 +93,14 @@ const Profile = () => {
     } else {
       setBodyTypes(TipoCuerpo.map((tc) => tc.tipoCuerpo))
     }
+
+    setDietType(TipoDieta[personalInformation.dietType].type)
+    setLoadingInfo(false)
   }
 
   useEffect(() => {
     dataForRegister()
-    console.log(personalAttr)
-    console.log(personalInformationEdit)
-  }, [personalInformationEdit])
+  }, [])
 
   return (
     <Screen
@@ -102,58 +110,79 @@ const Profile = () => {
       statusBarStyle="light"
     >
       <Text text="Tus Datos" preset="heading" />
-      <View style={styles.attributes}>
-        {personalAttr.map((attr, i) => {
-          if (i > 0) {
-            return (
-              attr[0] !== "weight" &&
-              attr[0] !== "dietType" && (
-                <View key={i}>
-                  <Text text={`${capitalizeString(TRADUCTIONS[attr[0]])}:`} preset="formLabel" />
-                  <View style={layout.row}>
-                    <Text text={`${attr[0] === "bodyType" ? bodyTypes[attr[1]] : attr[1]}`} />
-                    <Text text={`${attr[0] === "height" ? "cm" : ""}`} />
-                  </View>
-                </View>
-              )
-            )
-          } else {
-            return undefined
-          }
-        })}
-        <View>
-          <Text text={"Peso (Kg):"} />
-          <TextField
-            keyboardType="number-pad"
-            value={String(personalInformationEdit.weight)}
-            onChangeText={(e) => {
-              !e.includes(",") &&
-                setPersonalInformationEdit((prev) => {
-                  return { ...prev, weight: e }
-                })
-            }}
-          />
+      {loadingInfo ? (
+        <View style={{ gap: spacing.md, paddingTop: spacing.sm }}>
+          <Skeleton animation="pulse" width={260} height={44} style={styles.skeleton} />
+          <Skeleton animation="pulse" width={260} height={44} style={styles.skeleton} />
+          <Skeleton animation="pulse" width={260} height={44} style={styles.skeleton} />
+          <Skeleton animation="pulse" width={260} height={44} style={styles.skeleton} />
+          <Skeleton animation="pulse" width={260} height={44} style={styles.skeleton} />
+          <Skeleton animation="pulse" width={260} height={44} style={styles.skeleton} />
+          <Skeleton animation="pulse" width={340} height={55} style={styles.skeleton} />
+          <Skeleton animation="pulse" width={340} height={55} style={styles.skeleton} />
         </View>
-
-        <View style={{ gap: spacing.xxxs }}>
-          <Text text="Tipo de dieta:" />
-          <Picker
-            style={styles.picker}
-            mode="dropdown"
-            selectedValue={personalInformationEdit.dietType}
-            onValueChange={(itemValue) =>
-              setPersonalInformationEdit((prev) => {
-                return { ...prev, dietType: itemValue }
-              })
-            }
-          >
-            {dietTypes.map((td) => {
-              return <Picker.Item label={td} value={td} key={td} />
+      ) : (
+        <>
+          <View style={styles.attributes}>
+            {personalAttr.map((attr, i) => {
+              if (i > 0) {
+                return (
+                  attr[0] !== "weight" &&
+                  attr[0] !== "dietType" && (
+                    <View key={i}>
+                      <Text
+                        text={`${capitalizeString(TRADUCTIONS[attr[0]])}:`}
+                        preset="formLabel"
+                      />
+                      <View style={layout.row}>
+                        <Text text={`${attr[0] === "bodyType" ? bodyTypes[attr[1]] : attr[1]}`} />
+                        <Text text={`${attr[0] === "height" ? "cm" : ""}`} />
+                      </View>
+                    </View>
+                  )
+                )
+              } else {
+                return undefined
+              }
             })}
-          </Picker>
-        </View>
-      </View>
-      <Button text="Guardar cambios" onPress={() => handleSaveData()} preset="reversed" />
+            {weight && (
+              <View>
+                <Text text={"Peso (Kg):"} />
+                <TextField
+                  keyboardType="number-pad"
+                  value={String(weight)}
+                  onChangeText={(e) => {
+                    !e.includes(",") && setWeight(e)
+                  }}
+                />
+              </View>
+            )}
+
+            {dietType && (
+              <View style={{ gap: spacing.xxxs }}>
+                <Text text="Tipo de dieta:" />
+                <Picker
+                  style={styles.picker}
+                  mode="dropdown"
+                  selectedValue={dietType}
+                  onValueChange={(itemValue) => setDietType(itemValue)}
+                >
+                  {dietTypes.map((td) => {
+                    return <Picker.Item label={td} value={td} key={td} />
+                  })}
+                </Picker>
+              </View>
+            )}
+          </View>
+          <Button
+            text={guardandoCambios ? "Guardando..." : "Guardar cambios"}
+            onPress={() => handleSaveData()}
+            preset="reversed"
+            disabled={guardandoCambios}
+          />
+        </>
+      )}
+
       <Button tx="common.logOut" onPress={() => handleLogOut()} preset="reversed" />
     </Screen>
   )
@@ -169,4 +198,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   picker: { backgroundColor: colors.palette.primary200, borderRadius: 60 },
+  skeleton: { backgroundColor: colors.palette.primary200, borderRadius: 8 },
 })
