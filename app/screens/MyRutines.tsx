@@ -14,7 +14,7 @@ const routineDummy: Exercise[] = [
   {
     id: 1,
     muscle: "Chest",
-    day: "Monday",
+    date: moment("11/11/2024", "dd/mm/yyyy").toDate(),
     weight: 100,
     email: "user1@example.com",
     exercise: "Bench Press",
@@ -25,7 +25,7 @@ const routineDummy: Exercise[] = [
   {
     id: 2,
     muscle: "Back",
-    day: "Tuesday",
+    date: moment("10/11/2024", "dd/mm/yyyy").toDate(),
     weight: 80,
     email: "user2@example.com",
     exercise: "Deadlift",
@@ -36,7 +36,7 @@ const routineDummy: Exercise[] = [
   {
     id: 3,
     muscle: "Legs",
-    day: "Wednesday",
+    date: moment("12/11/2024", "dd/mm/yyyy").toDate(),
     weight: 120,
     email: "user3@example.com",
     exercise: "Squats",
@@ -47,7 +47,7 @@ const routineDummy: Exercise[] = [
   {
     id: 4,
     muscle: "Shoulders",
-    day: "Thursday",
+    date: moment("13/11/2024", "dd/mm/yyyy").toDate(),
     weight: 60,
     email: "user4@example.com",
     exercise: "Shoulder Press",

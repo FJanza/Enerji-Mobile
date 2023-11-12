@@ -43,10 +43,10 @@ const ExerciseDisplay = ({ exercise }: Props) => {
         </View>
         <View style={[layout.centerAllWidth, layout.row]}>
           <View style={layout.centerAllWidth}>
-            <Text text={`${exercise.serie}`} preset="invertDefault" />
+            <Text text={`${exercise.repetitions}`} preset="invertDefault" />
           </View>
           <View style={layout.centerAllWidth}>
-            <Text text={`${exercise.repetitions}`} preset="invertDefault" />
+            <Text text={`${exercise.serie}`} preset="invertDefault" />
           </View>
         </View>
       </View>
