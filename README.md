@@ -25,13 +25,13 @@ Turn on android emulator with AndroidStudio
 ```bash
   yarn start
 ```
-in other console
+In other console
 
 ```bash
-  yarn start
+  yarn android
 ```
 
-after that press "a" in console
+After installing app on emulator, in the first console, press "a"
 
 ## Screenshots
 
