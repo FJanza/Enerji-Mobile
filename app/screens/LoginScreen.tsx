@@ -21,13 +21,14 @@ import { layout } from "app/theme/global"
 import { Exercise, UserRegistration } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
-import Toast from "react-native-simple-toast"
+
 import { useDispatch } from "react-redux"
 
 import { setExersices, setUser } from "app/store/user"
 import DatePicker from "react-native-date-picker"
 import moment from "moment"
 import { capitalizeString } from "app/utils/text"
+import { showAlert } from "app/utils/alert"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
@@ -39,19 +40,6 @@ const windowHeight = Dimensions.get("window").height
 // TODO pasar a env
 const LOGIN_WITH_AUTH = true
 // TODO pasar a env
-
-// const dummyPersonalInformation: User = {
-//   email: "thebonitagamer777rexomg@gmail.com",
-//   birthDate: "13/11/2014",
-//   name: "Bonita",
-//   lastName: "Janza",
-//   height: 120,
-//   weight: 63,
-//   objective: "volumen",
-//   bodyType: "ectomorfo",
-//   dietType: "Equilibrada",
-//   sex: "female",
-// }
 
 const initialUserRegistration: Partial<UserRegistration> = {
   email: "",
@@ -134,10 +122,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     authenticationStore: { authEmail, setAuthEmail, setAuthToken },
   } = useStores()
 
-  const showAlert = (texto: string) => {
-    Toast.show(texto, Toast.SHORT)
-  }
-
   const dataForRegister = async () => {
     const { data: TipoDieta, error: errorTipoDieta } = await supabase
       .from("TipoDieta")
@@ -161,17 +145,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }
 
   useEffect(() => {
-    console.log({
-      userRegister,
-    })
-
-    // Here is where you could fetch credentials from keychain or storage
-    // and pre-fill the form fields.
     setAuthEmail("")
     setAuthPassword("")
     dataForRegister()
 
-    // Return a "cleanup" function that React will run when the component unmounts
     return () => {
       setAuthPassword("")
       setAuthEmail("")
@@ -205,7 +182,16 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
         if (errorDataBase?.message) {
           console.log(errorDataBase.message)
         } else {
-          dispatch(setUser({ personalInformation: { ...UserPersonalInformation[0] } }))
+          dispatch(
+            setUser({
+              personalInformation: {
+                ...UserPersonalInformation[0],
+                birthDate: moment(UserPersonalInformation[0].birthDate, "yyyy-MM-DD").format(
+                  "DD/MM/yyyy",
+                ),
+              },
+            }),
+          )
           dispatch(setExersices(routineDummy))
           setAuthToken(data.session.access_token)
         }

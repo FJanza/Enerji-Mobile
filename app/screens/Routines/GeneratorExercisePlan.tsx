@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button, Screen, Text, TextField } from "app/components"
 import { colors, spacing } from "app/theme"
 import { navigate } from "app/navigators"
@@ -10,18 +10,66 @@ import SelectDays from "app/components/SelectDays"
 import { ExercisePlan } from "app/Interfaces/Interfaces"
 import PlanDisplay from "../../components/PlanDisplay"
 import { planDummys } from "./MyExercisesPlans"
-
-const trainingTypes = ["Hipertrofia", "cardio"]
+import { generatePlan } from "app/services/enerjiApi"
+import { useSelector } from "react-redux"
+import { RootState } from "app/store"
+import { yearsToToday } from "app/utils/day"
+import moment from "moment"
+import { supabase } from "app/services/supabaseService"
+import { showAlert } from "app/utils/alert"
 
 const GeneratorExercisePlan = () => {
   const [trainingType, setTrainingType] = useState()
   const [duration, setDuration] = useState<string>()
   const [planGenerated, setPlanGenerated] = useState<ExercisePlan>(undefined)
   const [daysOfWeek, setDaysOfWeek] = useState([])
+  const { personalInformation } = useSelector((state: RootState) => state.user)
+  const [trainingTypes, setTrainingTypes] = useState([])
+  const [bodyTypes, setBodyTypes] = useState([])
+  const [loadingGenerate, setLoadingGenerate] = useState(false)
 
-  const handleGeneratePlan = () => {
-    setPlanGenerated(planDummys[0])
+  const handleGeneratePlan = async () => {
+    // TODO manejo de planes generados
+    setLoadingGenerate(true)
+    const gp = await generatePlan({
+      age: yearsToToday(moment(personalInformation.birthDate, "DD/MM/yyyy").toDate()),
+      cantDay: daysOfWeek.length,
+      excerciseType: trainingType,
+      bodyType: bodyTypes[personalInformation.bodyType],
+    })
+    gp
+      ? gp.map((gp, i) => {
+          console.log(i)
+          return gp.map((rd) => console.log(rd))
+        })
+      : console.log("error generating")
+    setLoadingGenerate(false)
   }
+
+  const dataFromSupa = async () => {
+    const { data, error } = await supabase.from("Objetivos").select("tipoObjetivo")
+
+    if (error?.message) {
+      showAlert(error.message)
+    } else {
+      setTrainingTypes(data.map((tc) => tc.tipoObjetivo))
+    }
+
+    const { data: TipoCuerpo, error: errorTipoCuerpo } = await supabase
+      .from("TipoCuerpo")
+      .select("tipoCuerpo")
+
+    if (errorTipoCuerpo?.message) {
+      showAlert(errorTipoCuerpo.message)
+    } else {
+      setBodyTypes(TipoCuerpo.map((tc) => tc.tipoCuerpo))
+    }
+  }
+
+  useEffect(() => {
+    dataFromSupa()
+  }, [])
+
   return (
     <Screen
       preset="scroll"
@@ -73,8 +121,10 @@ const GeneratorExercisePlan = () => {
           />
         </View>
         <Button
-          disabled={trainingType === "" || duration === "" || daysOfWeek.length === 0}
-          text="Generar Plan"
+          disabled={
+            loadingGenerate || !(trainingType !== "" && duration !== "" && daysOfWeek.length !== 0)
+          }
+          text={loadingGenerate ? "Generando.." : "Generar Plan"}
           preset="reversed"
           onPress={() => {
             handleGeneratePlan()
