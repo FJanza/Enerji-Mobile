@@ -18,13 +18,13 @@ import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 // import { useDispatch } from "react-redux"
 import { layout } from "app/theme/global"
-import { UserRegistration } from "app/Interfaces/Interfaces"
+import { Exercise, UserRegistration } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
 import Toast from "react-native-simple-toast"
 import { useDispatch } from "react-redux"
 
-import { setUser } from "app/store/user"
+import { setExersices, setUser } from "app/store/user"
 import DatePicker from "react-native-date-picker"
 import moment from "moment"
 import { capitalizeString } from "app/utils/text"
@@ -65,6 +65,53 @@ const initialUserRegistration: Partial<UserRegistration> = {
   dietType: "",
   sex: "Femenino",
 }
+
+const routineDummy: Exercise[] = [
+  {
+    id: 0,
+    muscle: "Chest",
+    date: moment().format("DD/MM/yyyy"),
+    weight: 100,
+    email: "thebonitagmer777rexomg@gmail.com",
+    exercise: "Bench Press",
+    idPlan: 101,
+    serie: 3,
+    repetitions: 10,
+  },
+  {
+    id: 1,
+    muscle: "Back",
+    date: moment().format("DD/MM/yyyy"),
+    weight: 80,
+    email: "thebonitagmer777rexomg@gmail.com",
+    exercise: "Deadlift",
+    idPlan: 102,
+    serie: 4,
+    repetitions: 8,
+  },
+  {
+    id: 2,
+    muscle: "Legs",
+    date: moment().format("DD/MM/yyyy"),
+    weight: 120,
+    email: "thebonitagmer777rexomg@gmail.com",
+    exercise: "Squats",
+    idPlan: 103,
+    serie: 3,
+    repetitions: 12,
+  },
+  {
+    id: 3,
+    muscle: "Shoulders",
+    date: moment().add(1, "days").format("DD/MM/yyyy"),
+    weight: 60,
+    email: "thebonitagmer777rexomg@gmail.com",
+    exercise: "Shoulder Press",
+    idPlan: 104,
+    serie: 5,
+    repetitions: 6,
+  },
+]
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
   const dispatch = useDispatch()
@@ -147,7 +194,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       } else {
         setAuthPassword("")
         setAuthEmail("")
-        // TODO traer informacion de tabla UserPersonalInformation
+        // TODO traer informacion de pesos historicos
         const { data: UserPersonalInformation, error: errorDataBase } = await supabase
           .from("UserPersonalInformation")
           .select(
@@ -159,6 +206,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           console.log(errorDataBase.message)
         } else {
           dispatch(setUser({ personalInformation: { ...UserPersonalInformation[0] } }))
+          console.log("first")
+          dispatch(setExersices(routineDummy))
           setAuthToken(data.session.access_token)
         }
       }
@@ -214,7 +263,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     const { error: errorData } = await supabase.from("UserPersonalInformation").insert([
       {
         email: userRegister.email,
-        fechaNacimiento: moment(userRegister.birthDate, "DD/MM/yyyy").toDate(),
+        fechaNacimiento: moment(userRegister.birthDate, "DD/MM/yyyy").format("DD/MM/yyyy"),
         nombre: capitalizeString(userRegister.name),
         apellido: capitalizeString(userRegister.lastName),
         altura: userRegister.height,

@@ -20,7 +20,7 @@ export interface Exercise {
   email: string
   muscle: string
   exercise: string
-  date: Date
+  date: string
   weight: number
   serie: number
   repetitions: number
@@ -30,8 +30,8 @@ export interface ExercisePlan {
   id: string
   title?: string
   routine: Exercise[]
-  startDate: Date
-  endDate: Date
+  startDate: string
+  endDate: string
   duration: number
 }
 

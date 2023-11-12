@@ -6,59 +6,17 @@ import { colors, spacing } from "app/theme"
 import DatePicker from "react-native-modern-datepicker"
 import moment from "moment"
 import { numToDayString } from "app/utils/day"
-import { Exercise } from "app/Interfaces/Interfaces"
 import { Divider } from "@rneui/themed"
 import ExerciseDisplay from "app/components/ExerciseDisplay"
-
-const routineDummy: Exercise[] = [
-  {
-    id: 1,
-    muscle: "Chest",
-    date: moment("11/11/2024", "dd/mm/yyyy").toDate(),
-    weight: 100,
-    email: "user1@example.com",
-    exercise: "Bench Press",
-    idPlan: 101,
-    serie: 3,
-    repetitions: 10,
-  },
-  {
-    id: 2,
-    muscle: "Back",
-    date: moment("10/11/2024", "dd/mm/yyyy").toDate(),
-    weight: 80,
-    email: "user2@example.com",
-    exercise: "Deadlift",
-    idPlan: 102,
-    serie: 4,
-    repetitions: 8,
-  },
-  {
-    id: 3,
-    muscle: "Legs",
-    date: moment("12/11/2024", "dd/mm/yyyy").toDate(),
-    weight: 120,
-    email: "user3@example.com",
-    exercise: "Squats",
-    idPlan: 103,
-    serie: 3,
-    repetitions: 12,
-  },
-  {
-    id: 4,
-    muscle: "Shoulders",
-    date: moment("13/11/2024", "dd/mm/yyyy").toDate(),
-    weight: 60,
-    email: "user4@example.com",
-    exercise: "Shoulder Press",
-    idPlan: 104,
-    serie: 5,
-    repetitions: 6,
-  },
-]
+import { useSelector } from "react-redux"
+import { RootState } from "app/store"
 
 const MyRutines = () => {
   const [selectedDate, setSelectedDate] = useState<Date>()
+
+  const { exercises } = useSelector((state: RootState) => state.user)
+
+  console.log(exercises)
 
   return (
     <Screen
@@ -91,16 +49,15 @@ const MyRutines = () => {
           />
         </View>
         <View style={styles.cardBody}>
-          {routineDummy.map((r, i) => {
-            return (
-              <View key={i} style={{ gap: spacing.xs }}>
-                <ExerciseDisplay exercise={r} />
-                {i !== routineDummy.length - 1 && (
-                  <Divider style={{ marginVertical: spacing.xs }} />
-                )}
-              </View>
-            )
-          })}
+          {exercises &&
+            exercises.map((r, i) => {
+              return (
+                <View key={i} style={{ gap: spacing.xs }}>
+                  <ExerciseDisplay exercise={r} />
+                  {i !== exercises.length - 1 && <Divider style={{ marginVertical: spacing.xs }} />}
+                </View>
+              )
+            })}
         </View>
       </View>
       <Button
