@@ -78,11 +78,14 @@ const slice = createSlice({
       return newState
     },
     setExersices: (state, action: PayloadAction<Exercise[]>) => {
+      state.exercises = action.payload
+    },
+    appendExersices: (state, action: PayloadAction<Exercise[]>) => {
       console.log(action.payload)
       console.log(state.exercises)
       const newState = {
         ...state,
-        exercises: [...action.payload],
+        exercises: [...state.exercises, ...action.payload],
       }
       console.log(newState)
 

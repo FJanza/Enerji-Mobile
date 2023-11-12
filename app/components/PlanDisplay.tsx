@@ -18,10 +18,10 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
   const [openStart, setOpenStart] = useState(false)
   const [showMore, setShowMore] = useState(false)
   const [openEnd, setOpenEnd] = useState(false)
-  const [startDate, setStartDate] = useState<Date>(plan.startDate)
-  const [endDate, setEndDate] = useState<Date>(plan.endDate)
+  const [startDate, setStartDate] = useState<Date>(moment(plan.startDate, "DD/MM/yyyy").toDate())
+  const [endDate, setEndDate] = useState<Date>(moment(plan.endDate, "DD/MM/yyyy").toDate())
 
-  const routinesSorted = plan.routine.sort((a, b) => dayToNumber[a.day] - dayToNumber[b.day])
+  const routinesSorted = plan.routine.sort((a, b) => dayToNumber[a.date] - dayToNumber[b.date])
 
   return (
     <View
@@ -126,8 +126,8 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
           return (
             <View key={i} style={{ gap: spacing.xxs }}>
               {/* REVISAR CUANDO USEMOS LA API */}
-              {i === 0 || routinesSorted[i - 1].day !== r.day ? (
-                <Text text={r.day} preset="invertBold" />
+              {i === 0 || routinesSorted[i - 1].date !== r.date ? (
+                <Text text={r.date} preset="invertBold" />
               ) : undefined}
               <View style={layout.rowBetweenCenter}>
                 {i === 0 || routinesSorted[i - 1].muscle !== r.muscle ? (

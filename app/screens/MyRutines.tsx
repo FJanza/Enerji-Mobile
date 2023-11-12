@@ -26,6 +26,12 @@ const MyRutines = () => {
       statusBarStyle="light"
     >
       <DatePicker
+        options={{
+          textHeaderColor: colors.palette.primary600,
+          selectedTextColor: "#fff",
+          mainColor: colors.palette.primary600,
+        }}
+        selected={moment(selectedDate).format("YYYY-MM-DD")}
         onSelectedChange={(date: string) => {
           const dateDate = moment(date, "YYYY/MM/DD").toDate()
           !moment(selectedDate).isSame(dateDate) && setSelectedDate(dateDate)
@@ -50,14 +56,18 @@ const MyRutines = () => {
         </View>
         <View style={styles.cardBody}>
           {exercises &&
-            exercises.map((r, i) => {
-              return (
-                <View key={i} style={{ gap: spacing.xs }}>
-                  <ExerciseDisplay exercise={r} />
-                  {i !== exercises.length - 1 && <Divider style={{ marginVertical: spacing.xs }} />}
-                </View>
-              )
-            })}
+            exercises
+              .filter((ex) => moment(ex.date, "DD/MM/yyyy").isSame(selectedDate))
+              .map((exersice, i) => {
+                return (
+                  <View key={i} style={{ gap: spacing.xs }}>
+                    <ExerciseDisplay exercise={exersice} />
+                    {i !== exercises.length - 1 && (
+                      <Divider style={{ marginVertical: spacing.xs }} />
+                    )}
+                  </View>
+                )
+              })}
         </View>
       </View>
       <Button

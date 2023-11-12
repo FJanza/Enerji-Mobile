@@ -65,7 +65,7 @@ const initialUserRegistration: Partial<UserRegistration> = {
   dietType: "",
   sex: "Femenino",
 }
-
+// TODO sacar el dummy y traer de supa
 const routineDummy: Exercise[] = [
   {
     id: 0,
@@ -206,7 +206,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           console.log(errorDataBase.message)
         } else {
           dispatch(setUser({ personalInformation: { ...UserPersonalInformation[0] } }))
-          console.log("first")
           dispatch(setExersices(routineDummy))
           setAuthToken(data.session.access_token)
         }
@@ -250,12 +249,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   )
 
   const handleRegister = async () => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: userRegister.email,
       password: userRegister.password,
     })
-    // TODO sacar clg para presentar
-    console.log({ data, error })
     if (error?.message) {
       showAlert(error.message)
     }

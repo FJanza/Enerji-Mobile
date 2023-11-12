@@ -57,7 +57,6 @@ const Profile = () => {
         dietType: dietTypes.indexOf(dietType),
       }),
     )
-    // TODO agregar el subir cambios a db en supabase
     const { error } = await supabase
       .from("UserPersonalInformation")
       .update({
