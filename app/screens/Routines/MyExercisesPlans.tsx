@@ -6,7 +6,7 @@ import { colors, spacing } from "app/theme"
 import { layout } from "app/theme/global"
 import moment from "moment"
 import { ExercisePlan } from "app/Interfaces/Interfaces"
-import PlanDisplay from "./PlanDisplay"
+import PlanDisplay from "../../components/PlanDisplay"
 
 export const planDummys: ExercisePlan[] = [
   {

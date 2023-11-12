@@ -8,7 +8,7 @@ import { layout } from "app/theme/global"
 import { Picker } from "@react-native-picker/picker"
 import SelectDays from "app/components/SelectDays"
 import { ExercisePlan } from "app/Interfaces/Interfaces"
-import PlanDisplay from "./PlanDisplay"
+import PlanDisplay from "../../components/PlanDisplay"
 import { planDummys } from "./MyExercisesPlans"
 
 const trainingTypes = ["Hipertrofia", "cardio"]

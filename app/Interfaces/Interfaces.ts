@@ -16,11 +16,11 @@ export interface UserRegistration extends User {
 }
 
 export interface Routine {}
-export interface Exersice {
+export interface Exercise {
   id: number
   muscle: string
   day: string
-  weight: string
+  weight: number
   email: string
   exercise: string
   idPlan: number
@@ -29,8 +29,8 @@ export interface Exersice {
 }
 export interface ExercisePlan {
   id: string
-  title: string
-  routine: Exersice[]
+  title?: string
+  routine: Exercise[]
   startDate: Date
   endDate: Date
   duration: number
