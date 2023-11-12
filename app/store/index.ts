@@ -40,7 +40,7 @@ export const reduxStorage: Storage = {
 const persistConfig = {
   key: "root",
   storage: reduxStorage,
-  whitelist: ["auth"],
+  whitelist: ["auth", "user"],
 }
 
 const persistedReducer = persistReducer(persistConfig, reducers)
