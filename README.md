@@ -5,13 +5,6 @@ App mobile diseñada en React-native
 
 ![logoEnerji](https://github.com/FJanza/Enerji-Mobile/assets/62725867/305ff92c-75a1-410c-b029-4b7a3f474dd4)
 
-
-
-## Demo
-
-Insert gif or link to demo
-
-
 ## Deployment
 
 To deploy this project run
