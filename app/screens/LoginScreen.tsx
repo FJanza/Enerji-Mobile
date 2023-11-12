@@ -78,6 +78,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const [bodyTypes, setBodyTypes] = useState([])
   const [openDatePicker, setOpenDatePicker] = useState(false)
   const [birthDate, setBirthDate] = useState<Date>(new Date())
+  const [loadingLogIn, setLoadingLogIn] = useState(false)
 
   const [userRegister, setUserRegister] =
     useState<Partial<UserRegistration>>(initialUserRegistration)
@@ -132,6 +133,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
   const login = async () => {
     if (LOGIN_WITH_AUTH) {
+      setLoadingLogIn(true)
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: authEmail,
         password: authPassword,
@@ -155,13 +158,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
         if (errorDataBase?.message) {
           console.log(errorDataBase.message)
         } else {
-          console.log("***********************************************")
-          console.log(UserPersonalInformation)
-          console.log("***********************************************")
           dispatch(setUser({ personalInformation: { ...UserPersonalInformation[0] } }))
           setAuthToken(data.session.access_token)
         }
       }
+      setLoadingLogIn(false)
     } else {
       setAuthToken("a")
     }
@@ -204,7 +205,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       email: userRegister.email,
       password: userRegister.password,
     })
+    // TODO sacar clg para presentar
     console.log({ data, error })
+    if (error?.message) {
+      showAlert(error.message)
+    }
 
     const { error: errorData } = await supabase.from("UserPersonalInformation").insert([
       {
@@ -220,7 +225,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       },
     ])
     if (errorData?.message) {
-      console.log(errorData.message)
+      showAlert(errorData.message)
     }
 
     setOpenRegisterModal(false)
@@ -265,10 +270,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
         />
         <Button
           testID="login-button"
-          text="Log in"
+          text={loadingLogIn ? "Conectando.." : "Log in"}
           style={$tapButton}
           preset="reversed"
           onPress={login}
+          disabled={loadingLogIn}
         />
         <View style={$registerButton}>
           <View style={layout.row}>

@@ -4,14 +4,13 @@ import React from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
-import { translate } from "../i18n"
 import { DemoDebugScreen } from "../screens"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import Profile from "app/screens/Profile"
 import { RoutinesNavigator } from "./RoutinesNavigator"
 
-export type DemoTabParamList = {
+export type WindowsList = {
   Perfil: undefined
   PlanAlimenticio: undefined
   PlanEjercicio: undefined
@@ -24,12 +23,12 @@ const logo = require("../../assets/images/logoEnerji.png")
  *
  * More info: https://reactnavigation.org/docs/typescript/#organizing-types
  */
-export type DemoTabScreenProps<T extends keyof DemoTabParamList> = CompositeScreenProps<
-  BottomTabScreenProps<DemoTabParamList, T>,
+export type DemoTabScreenProps<T extends keyof WindowsList> = CompositeScreenProps<
+  BottomTabScreenProps<WindowsList, T>,
   AppStackScreenProps<keyof AppStackParamList>
 >
 
-const Tab = createBottomTabNavigator<DemoTabParamList>()
+const Tab = createBottomTabNavigator<WindowsList>()
 
 export function HomeNavigator() {
   const { bottom } = useSafeAreaInsets()
@@ -54,8 +53,7 @@ export function HomeNavigator() {
         name="PlanEjercicio"
         component={RoutinesNavigator}
         options={{
-          tabBarAccessibilityLabel: translate("demoNavigator.mancuernas"),
-          tabBarLabel: translate("demoNavigator.mancuernas"),
+          tabBarLabel: "Ejercicio",
           tabBarIcon: ({ focused }) => (
             <Icon icon="mancuernas" color={focused && colors.tint} size={40} />
           ),
@@ -66,7 +64,7 @@ export function HomeNavigator() {
         name="PlanAlimenticio"
         component={DemoDebugScreen}
         options={{
-          tabBarLabel: translate("demoNavigator.comida"),
+          tabBarLabel: "Alimentación",
           tabBarIcon: ({ focused }) => (
             <Icon icon="comida" color={focused && colors.tint} size={40} />
           ),
@@ -77,7 +75,7 @@ export function HomeNavigator() {
         name="Perfil"
         component={Profile}
         options={{
-          tabBarLabel: "Profile",
+          tabBarLabel: "Perfil",
           tabBarIcon: ({ focused }) => (
             <Icon icon="usuario" color={focused && colors.tint} size={40} />
           ),

@@ -15,7 +15,7 @@ import { DrawerLayout, DrawerState } from "react-native-gesture-handler"
 import { useSharedValue, withTiming } from "react-native-reanimated"
 import { ListItem, Screen, Text } from "../../components"
 import { isRTL } from "../../i18n"
-import { DemoTabParamList, DemoTabScreenProps } from "../../navigators/HomeNavigator"
+import { WindowsList, DemoTabScreenProps } from "../../navigators/HomeNavigator"
 import { colors, spacing } from "../../theme"
 import { useSafeAreaInsetsStyle } from "../../utils/useSafeAreaInsetsStyle"
 import * as Demos from "./demos"
@@ -92,7 +92,7 @@ export const DemoShowroomScreen: FC<DemoTabScreenProps<"DemoShowroom">> =
     const listRef = useRef<SectionList>()
     const menuRef = useRef<FlatList>()
     const progress = useSharedValue(0)
-    const route = useRoute<RouteProp<DemoTabParamList, "DemoShowroom">>()
+    const route = useRoute<RouteProp<WindowsList, "DemoShowroom">>()
     const params = route.params
 
     // handle Web links
