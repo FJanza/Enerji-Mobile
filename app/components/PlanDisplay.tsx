@@ -1,4 +1,4 @@
-import { View, StyleSheet, Pressable } from "react-native"
+import { View, StyleSheet } from "react-native"
 import React, { useState } from "react"
 import { ExercisePlan } from "app/Interfaces/Interfaces"
 import { colors, spacing } from "app/theme"
@@ -6,7 +6,8 @@ import Collapsible from "react-native-collapsible"
 import { layout } from "app/theme/global"
 import { Button, Text } from "app/components"
 import moment from "moment"
-import DatePicker from "react-native-date-picker"
+import { Divider } from "@rneui/base"
+import { capitalizeString } from "app/utils/text"
 
 interface PlanDisplayProps {
   plan: ExercisePlan
@@ -14,11 +15,7 @@ interface PlanDisplayProps {
 }
 
 const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
-  const [openStart, setOpenStart] = useState(false)
   const [showMore, setShowMore] = useState(false)
-  const [openEnd, setOpenEnd] = useState(false)
-  const [startDate, setStartDate] = useState<Date>(moment(plan.startDate, "DD/MM/yyyy").toDate())
-  const [endDate, setEndDate] = useState<Date>(moment(plan.endDate, "DD/MM/yyyy").toDate())
 
   const routinesSorted = plan.routine.sort(
     (a, b) =>
@@ -30,7 +27,12 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
     <View
       style={[
         styles.planContainer,
-        moment(new Date()).isBetween(startDate, endDate) ? styles.planContainerToDay : null,
+        moment(new Date()).isBetween(
+          moment(plan.startDate, "DD/MM/yyyy"),
+          moment(plan.endDate, "DD/MM/yyyy"),
+        )
+          ? styles.planContainerToDay
+          : null,
       ]}
     >
       <View style={[layout.rowBetween, { padding: spacing.xs }]}>
@@ -38,69 +40,29 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
           {/* StartDate */}
           <View style={styles.dateTitle}>
             <Text text={`Desde: `} preset="invertDefault" />
-            <Pressable
-              onPress={() => {
-                setOpenStart(true)
+
+            <Text
+              text={plan.startDate}
+              preset="invertDefault"
+              style={{
+                backgroundColor: colors.palette.primary300,
+                padding: spacing.xxs,
+                borderRadius: spacing.xs,
               }}
-            >
-              <Text
-                text={`${moment(startDate).format("DD/MM/yyyy")}`}
-                preset="invertDefault"
-                style={{
-                  backgroundColor: colors.palette.primary300,
-                  padding: spacing.xxs,
-                  borderRadius: spacing.xs,
-                }}
-              />
-            </Pressable>
-            <DatePicker
-              title="Select start date"
-              modal
-              open={openStart}
-              date={startDate}
-              onConfirm={(date) => {
-                setStartDate(date)
-                setEndDate(moment(date).add(plan.duration, "months").toDate())
-                setOpenStart(false)
-              }}
-              onCancel={() => {
-                setOpenStart(false)
-              }}
-              mode="date"
             />
           </View>
           {/* EndDate */}
           <View style={styles.dateTitle}>
             <Text text={`Hasta: `} preset="invertDefault" />
-            <Pressable
-              onPress={() => {
-                setOpenEnd(true)
+
+            <Text
+              text={plan.endDate}
+              preset="invertDefault"
+              style={{
+                backgroundColor: colors.palette.primary300,
+                padding: spacing.xxs,
+                borderRadius: spacing.xs,
               }}
-            >
-              <Text
-                text={`${moment(endDate).format("DD/MM/yyyy")}`}
-                preset="invertDefault"
-                style={{
-                  backgroundColor: colors.palette.primary300,
-                  padding: spacing.xxs,
-                  borderRadius: spacing.xs,
-                }}
-              />
-            </Pressable>
-            <DatePicker
-              title="Select end date"
-              modal
-              open={openEnd}
-              date={endDate}
-              onConfirm={(date) => {
-                setEndDate(date)
-                setStartDate(moment(date).subtract(plan.duration, "months").toDate())
-                setOpenEnd(false)
-              }}
-              onCancel={() => {
-                setOpenEnd(false)
-              }}
-              mode="date"
             />
           </View>
         </View>
@@ -129,22 +91,36 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
             <View key={i} style={{ gap: spacing.xxs }}>
               {/* REVISAR CUANDO USEMOS LA API */}
               {i === 0 || routinesSorted[i - 1].date !== r.date ? (
-                <Text text={moment(r.date, "DD/MM/yyyy").format("dddd")} preset="invertBold" />
+                <Text
+                  text={`-${moment(r.date, "DD/MM/yyyy").format("dddd")}`}
+                  preset="invertBold"
+                  size="md"
+                  style={{ marginTop: spacing.xs }}
+                />
               ) : undefined}
-              <View style={layout.rowBetweenCenter}>
+              <View>
                 {i === 0 || routinesSorted[i - 1].muscle !== r.muscle ? (
-                  <Text text={r.muscle} preset="invertDefault" style={styles.firtsColumnRoutine} />
+                  <View>
+                    <Text
+                      text={` ${capitalizeString(r.muscle)}`}
+                      preset="invertBold"
+                      style={styles.firtsColumnRoutine}
+                    />
+                    <Divider />
+                  </View>
                 ) : (
                   <View style={styles.firtsColumnRoutine} />
                 )}
-
-                <Text
-                  text={`*${r.exercise}`}
-                  preset="invertDefault"
-                  style={styles.secondColumnRoutine}
-                />
-                <Text text={`series: ${r.series}`} preset="invertDefault" style={layout.fill} />
-                <Text text={`resp: ${r.repeat}`} preset="invertDefault" style={layout.fill} />
+                <View style={layout.rowBetweenCenter}>
+                  <Text
+                    text={`*${r.exercise}`}
+                    preset="invertDefault"
+                    style={styles.secondColumnRoutine}
+                  />
+                  <Text text={`series: ${r.series}`} preset="invertDefault" style={layout.fill} />
+                  <Text text={`resp: ${r.repeat}`} preset="invertDefault" style={layout.fill} />
+                </View>
+                <Divider />
               </View>
             </View>
           )
@@ -175,5 +151,5 @@ const styles = StyleSheet.create({
   planContainerToDay: {
     borderColor: colors.palette.quiet300,
   },
-  secondColumnRoutine: { flex: 1.5 },
+  secondColumnRoutine: { flex: 2 },
 })

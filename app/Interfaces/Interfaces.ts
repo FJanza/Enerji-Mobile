@@ -27,6 +27,7 @@ export interface Exercise {
 }
 export interface ExercisePlan {
   id: number
+  email?: string
   routine: Exercise[]
   startDate: string
   endDate: string

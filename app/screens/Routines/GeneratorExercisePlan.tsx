@@ -9,20 +9,20 @@ import { Picker } from "@react-native-picker/picker"
 import SelectDays from "app/components/SelectDays"
 import { Exercise, ExercisePlan } from "app/Interfaces/Interfaces"
 import PlanDisplay from "../../components/PlanDisplay"
-import { planDummys } from "./MyExercisesPlans"
 import { generatePlan } from "app/services/enerjiApi"
 import { useSelector } from "react-redux"
 import { RootState } from "app/store"
 import { getDatesBetween, yearsToToday } from "app/utils/day"
 import moment from "moment"
 import { supabase } from "app/services/supabaseService"
-import { showAlert } from "app/utils/alert"
 import DatePicker from "react-native-date-picker"
+import { showAlert } from "app/utils/alert"
 
 const GeneratorExercisePlan = () => {
   const [trainingType, setTrainingType] = useState()
   const [duration, setDuration] = useState<string>()
-  const [planGenerated, setPlanGenerated] = useState(undefined)
+  const [planGenerated, setPlanGenerated] = useState<ExercisePlan>(undefined)
+  const [routines, setRoutines] = useState<Exercise[]>([])
   const [daysOfWeek, setDaysOfWeek] = useState([])
   const { personalInformation } = useSelector((state: RootState) => state.user)
   const [trainingTypes, setTrainingTypes] = useState([])
@@ -30,15 +30,36 @@ const GeneratorExercisePlan = () => {
   const [loadingGenerate, setLoadingGenerate] = useState(false)
   const [openStart, setOpenStart] = useState(false)
   const [startDate, setStartDate] = useState(new Date())
+  const [newPlan, setNewPlan] = useState(null)
 
   const handleGeneratePlan = async () => {
     setLoadingGenerate(true)
     const endDate = moment(startDate).add(duration, "months").toDate()
 
-    const newPlan = {
-      email: personalInformation.email,
-      startDate: moment(startDate).format("DD/MM/yyyy"),
-      endDate: moment(endDate).format("DD/MM/yyyy"),
+    if (!newPlan) {
+      const { data, error } = await supabase
+        .from("PlanEjercicio")
+        .insert([
+          {
+            email: personalInformation.email,
+            desde: moment(startDate, "DD/MM/yyyy").toDate(),
+            hasta: moment(endDate, "DD/MM/yyyy").toDate(),
+            duracion: Number(duration),
+          },
+        ])
+        .select()
+      if (error?.message) {
+        console.log(`Error al generar plan ne supabase: ${error.message}`)
+        setLoadingGenerate(false)
+        return undefined
+      }
+
+      setNewPlan({
+        email: personalInformation.email,
+        startDate: moment(startDate).format("DD/MM/yyyy"),
+        endDate: moment(endDate).format("DD/MM/yyyy"),
+        id: data[0].id,
+      })
     }
 
     const generatedPlan = await generatePlan({
@@ -53,10 +74,11 @@ const GeneratorExercisePlan = () => {
       })
 
       const routinesOneWeek = generatedPlan.map((routineDay, i) => {
-        return routineDay.map((exercise) => {
-          const { excercise_id: _, ...newExercise } = exercise
+        return routineDay.map((exe) => {
+          const { excercise_id: _, excercise: __, ...newExercise } = exe
           return {
             ...newExercise,
+            exercise: exe.excercise,
             day: daysOfWeek[i],
             idPlan: 1,
             email: personalInformation.email,
@@ -73,17 +95,51 @@ const GeneratorExercisePlan = () => {
               routines.push(
                 routinesOneWeek[i].map((exercise) => {
                   const { day: _, ...newExercise } = exercise
-                  return { ...newExercise, date: moment(dates[j].dates[k]).format("DD/MM/yyyy") }
+                  return {
+                    ...newExercise,
+                    date: moment(dates[j].dates[k]).format("DD/MM/yyyy"),
+                    repeat: Number(exercise.repeat),
+                    series: Number(exercise.series),
+                    weight: Number(exercise.weight),
+                  }
                 }),
               )
             }
           }
         }
       }
-      // TODO no se guarda
-      setPlanGenerated({ ...newPlan, routines: routines[0], id: 1, duration })
+
+      // eslint-disable-next-line prefer-spread
+      const routines2 = [].concat.apply([], routines)
+
+      // Usar un Set para almacenar etiquetas únicas
+      const uniqueDay = new Set()
+
+      // Filtrar el array y agregar las etiquetas únicas al Set
+      const filteredArray = routines.map((r) =>
+        r.filter((item) => {
+          const isUnique = !uniqueDay.has(
+            `${item.exercise}${moment(item.date, "DD/MM/yyyy").format("dddd")}`,
+          )
+          uniqueDay.add(`${item.exercise}${moment(item.date, "DD/MM/yyyy").format("dddd")}`)
+          return isUnique
+        }),
+      )
+
+      // eslint-disable-next-line prefer-spread
+      const routineOfWeekToDisplay = [].concat.apply([], filteredArray)
+
+      setPlanGenerated({
+        ...newPlan,
+        routine: routineOfWeekToDisplay,
+        id: 1,
+        duration: Number(duration),
+      })
+      setRoutines(routines2)
+      console.log(routines2)
+      showAlert("generado correctamente")
     } else {
-      console.log("error generating")
+      showAlert("Error al generar, intentelo de nuevo")
     }
     setLoadingGenerate(false)
   }
