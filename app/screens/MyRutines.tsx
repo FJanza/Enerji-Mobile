@@ -16,8 +16,6 @@ const MyRutines = () => {
 
   const { exercises } = useSelector((state: RootState) => state.user)
 
-  console.log(exercises)
-
   return (
     <Screen
       preset="scroll"

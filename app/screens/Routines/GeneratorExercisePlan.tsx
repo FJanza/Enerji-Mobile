@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native"
+import { Pressable, StyleSheet, View } from "react-native"
 import React, { useEffect, useState } from "react"
 import { Button, Screen, Text, TextField } from "app/components"
 import { colors, spacing } from "app/theme"
@@ -7,42 +7,84 @@ import { ROUTES } from "app/utils/routes"
 import { layout } from "app/theme/global"
 import { Picker } from "@react-native-picker/picker"
 import SelectDays from "app/components/SelectDays"
-import { ExercisePlan } from "app/Interfaces/Interfaces"
+import { Exercise, ExercisePlan } from "app/Interfaces/Interfaces"
 import PlanDisplay from "../../components/PlanDisplay"
 import { planDummys } from "./MyExercisesPlans"
 import { generatePlan } from "app/services/enerjiApi"
 import { useSelector } from "react-redux"
 import { RootState } from "app/store"
-import { yearsToToday } from "app/utils/day"
+import { getDatesBetween, yearsToToday } from "app/utils/day"
 import moment from "moment"
 import { supabase } from "app/services/supabaseService"
 import { showAlert } from "app/utils/alert"
+import DatePicker from "react-native-date-picker"
 
 const GeneratorExercisePlan = () => {
   const [trainingType, setTrainingType] = useState()
   const [duration, setDuration] = useState<string>()
-  const [planGenerated, setPlanGenerated] = useState<ExercisePlan>(undefined)
+  const [planGenerated, setPlanGenerated] = useState(undefined)
   const [daysOfWeek, setDaysOfWeek] = useState([])
   const { personalInformation } = useSelector((state: RootState) => state.user)
   const [trainingTypes, setTrainingTypes] = useState([])
   const [bodyTypes, setBodyTypes] = useState([])
   const [loadingGenerate, setLoadingGenerate] = useState(false)
+  const [openStart, setOpenStart] = useState(false)
+  const [startDate, setStartDate] = useState(new Date())
 
   const handleGeneratePlan = async () => {
-    // TODO manejo de planes generados
     setLoadingGenerate(true)
-    const gp = await generatePlan({
+    const endDate = moment(startDate).add(duration, "months").toDate()
+
+    const newPlan = {
+      email: personalInformation.email,
+      startDate: moment(startDate).format("DD/MM/yyyy"),
+      endDate: moment(endDate).format("DD/MM/yyyy"),
+    }
+
+    const generatedPlan = await generatePlan({
       age: yearsToToday(moment(personalInformation.birthDate, "DD/MM/yyyy").toDate()),
       cantDay: daysOfWeek.length,
       excerciseType: trainingType,
       bodyType: bodyTypes[personalInformation.bodyType],
     })
-    gp
-      ? gp.map((gp, i) => {
-          console.log(i)
-          return gp.map((rd) => console.log(rd))
+    if (generatedPlan) {
+      const dates = daysOfWeek.map((day) => {
+        return { day, dates: getDatesBetween(startDate, endDate, day) }
+      })
+
+      const routinesOneWeek = generatedPlan.map((routineDay, i) => {
+        return routineDay.map((exercise) => {
+          const { excercise_id: _, ...newExercise } = exercise
+          return {
+            ...newExercise,
+            day: daysOfWeek[i],
+            idPlan: 1,
+            email: personalInformation.email,
+          }
         })
-      : console.log("error generating")
+      })
+
+      const routines = []
+
+      for (let i = 0; i < routinesOneWeek.length; i++) {
+        for (let j = 0; j < dates.length; j++) {
+          if (routinesOneWeek[i][0].day === dates[j].day) {
+            for (let k = 0; k < dates[j].dates.length; k++) {
+              routines.push(
+                routinesOneWeek[i].map((exercise) => {
+                  const { day: _, ...newExercise } = exercise
+                  return { ...newExercise, date: moment(dates[j].dates[k]).format("DD/MM/yyyy") }
+                }),
+              )
+            }
+          }
+        }
+      }
+      // TODO no se guarda
+      setPlanGenerated({ ...newPlan, routines: routines[0], id: 1, duration })
+    } else {
+      console.log("error generating")
+    }
     setLoadingGenerate(false)
   }
 
@@ -97,18 +139,51 @@ const GeneratorExercisePlan = () => {
             </Picker>
           </View>
         </View>
-        <View>
-          <View style={layout.row}>
-            <Text text="Duración " preset="invertBold" />
-            <Text text="(en meses)" preset="invertDefault" />
-          </View>
+        <View style={{ gap: spacing.xs }}>
+          {/* Duration */}
+
           <View>
-            <TextField
-              keyboardType="decimal-pad"
-              value={duration}
-              onChangeText={(e) => {
-                setDuration(e)
+            <View style={layout.row}>
+              <Text text="Duración " preset="invertBold" />
+              <Text text="(en meses)" preset="invertDefault" />
+            </View>
+            <View>
+              <TextField
+                keyboardType="decimal-pad"
+                value={duration}
+                onChangeText={(e) => {
+                  setDuration(e)
+                }}
+              />
+            </View>
+          </View>
+          {/* StartDate */}
+          <View style={styles.dateTitle}>
+            <Text text={`Fecha de incio: `} preset="invertBold" />
+            <Pressable
+              onPress={() => {
+                setOpenStart(true)
               }}
+            >
+              <Text
+                text={`${moment(startDate).format("DD/MM/yyyy")}`}
+                preset="invertDefault"
+                style={styles.dateText}
+              />
+            </Pressable>
+            <DatePicker
+              title="Select start date"
+              modal
+              open={openStart}
+              date={startDate}
+              onConfirm={(date) => {
+                setStartDate(date)
+                setOpenStart(false)
+              }}
+              onCancel={() => {
+                setOpenStart(false)
+              }}
+              mode="date"
             />
           </View>
         </View>
@@ -132,7 +207,7 @@ const GeneratorExercisePlan = () => {
         />
       </View>
 
-      {planGenerated && <PlanDisplay plan={planGenerated} showDeleteButton={false} />}
+      {planGenerated ? <PlanDisplay plan={planGenerated} showDeleteButton={false} /> : undefined}
 
       <Button
         // falta handler que sume el plan a la db y al redux
@@ -152,6 +227,16 @@ const styles = StyleSheet.create({
     gap: spacing.xl,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
+  },
+  dateText: {
+    backgroundColor: colors.palette.primary100,
+    borderColor: colors.palette.neutral400,
+    borderRadius: spacing.xs,
+    borderWidth: 1,
+    padding: spacing.sm,
+  },
+  dateTitle: {
+    alignItems: "flex-start",
   },
   filterContainer: {
     backgroundColor: colors.palette.primary200,

@@ -18,3 +18,17 @@ export const dayToNumber: Record<string, number> = {
 export const yearsToToday = (date: Date) => {
   return moment().diff(moment(date), "years")
 }
+
+export const getDatesBetween = (startDate: Date, endDate: Date, dayOfWeek: string) => {
+  const dates = []
+  const currentDate = moment(startDate)
+
+  while (currentDate.isSameOrBefore(endDate)) {
+    if (currentDate.day() === moment().day(dayOfWeek).day()) {
+      dates.push(currentDate.format("YYYY-MM-DD"))
+    }
+    currentDate.add(1, "days")
+  }
+
+  return dates
+}

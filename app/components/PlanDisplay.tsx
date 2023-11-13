@@ -7,7 +7,6 @@ import { layout } from "app/theme/global"
 import { Button, Text } from "app/components"
 import moment from "moment"
 import DatePicker from "react-native-date-picker"
-import { dayToNumber } from "app/utils/day"
 
 interface PlanDisplayProps {
   plan: ExercisePlan
@@ -21,7 +20,11 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
   const [startDate, setStartDate] = useState<Date>(moment(plan.startDate, "DD/MM/yyyy").toDate())
   const [endDate, setEndDate] = useState<Date>(moment(plan.endDate, "DD/MM/yyyy").toDate())
 
-  const routinesSorted = plan.routine.sort((a, b) => dayToNumber[a.date] - dayToNumber[b.date])
+  const routinesSorted = plan.routine.sort(
+    (a, b) =>
+      moment(a.date, "DD/MM/yyyy").toDate().getTime() -
+      moment(b.date, "DD/MM/yyyy").toDate().getTime(),
+  )
 
   return (
     <View
@@ -32,7 +35,6 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
     >
       <View style={[layout.rowBetween, { padding: spacing.xs }]}>
         <View style={styles.infoPrincipal}>
-          <Text text={`${plan.title}`} preset="invertDefault" />
           {/* StartDate */}
           <View style={styles.dateTitle}>
             <Text text={`Desde: `} preset="invertDefault" />
@@ -127,7 +129,7 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
             <View key={i} style={{ gap: spacing.xxs }}>
               {/* REVISAR CUANDO USEMOS LA API */}
               {i === 0 || routinesSorted[i - 1].date !== r.date ? (
-                <Text text={r.date} preset="invertBold" />
+                <Text text={moment(r.date, "DD/MM/yyyy").format("dddd")} preset="invertBold" />
               ) : undefined}
               <View style={layout.rowBetweenCenter}>
                 {i === 0 || routinesSorted[i - 1].muscle !== r.muscle ? (
@@ -141,8 +143,8 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
                   preset="invertDefault"
                   style={styles.secondColumnRoutine}
                 />
-                <Text text={`series: ${r.serie}`} preset="invertDefault" style={layout.fill} />
-                <Text text={`resp: ${r.repetitions}`} preset="invertDefault" style={layout.fill} />
+                <Text text={`series: ${r.series}`} preset="invertDefault" style={layout.fill} />
+                <Text text={`resp: ${r.repeat}`} preset="invertDefault" style={layout.fill} />
               </View>
             </View>
           )
