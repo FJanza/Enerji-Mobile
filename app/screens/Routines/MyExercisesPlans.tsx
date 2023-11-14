@@ -8,6 +8,7 @@ import { layout } from "app/theme/global"
 import PlanDisplay from "../../components/PlanDisplay"
 import { useSelector } from "react-redux"
 import { RootState } from "app/store"
+import { ROUTES } from "app/utils/routes"
 
 const MyExercisesPlans = () => {
   const { exercisePlans } = useSelector((state: RootState) => state.user)
@@ -23,14 +24,14 @@ const MyExercisesPlans = () => {
         <View style={layout.rowBetween}>
           <Button
             onPress={() => {
-              navigate("MyRoutines")
+              navigate(ROUTES.MY_ROUTINES)
             }}
             text="Mis rutinas"
             preset="reversed"
           />
           <Button
             onPress={() => {
-              navigate("GeneratorExercisePlan")
+              navigate(ROUTES.GENERATOR_EXERCISE_PLAN)
             }}
             text="Generador de planes"
             preset="reversed"

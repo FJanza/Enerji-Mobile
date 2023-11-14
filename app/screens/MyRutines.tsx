@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button, Screen, Text } from "app/components"
 import { navigate } from "app/navigators"
 import { colors, spacing } from "app/theme"
@@ -14,7 +14,13 @@ import { RootState } from "app/store"
 const MyRutines = () => {
   const [selectedDate, setSelectedDate] = useState<Date>()
 
+  const [exerciseOfDay, setExerciseOfDay] = useState([])
+
   const { exercises } = useSelector((state: RootState) => state.user)
+
+  useEffect(() => {
+    setExerciseOfDay(exercises.filter((ex) => moment(ex.date, "DD/MM/yyyy").isSame(selectedDate)))
+  }, [selectedDate])
 
   return (
     <Screen
@@ -53,19 +59,25 @@ const MyRutines = () => {
           />
         </View>
         <View style={styles.cardBody}>
-          {exercises &&
-            exercises
-              .filter((ex) => moment(ex.date, "DD/MM/yyyy").isSame(selectedDate))
-              .map((exersice, i) => {
-                return (
-                  <View key={i} style={{ gap: spacing.xs }}>
-                    <ExerciseDisplay exercise={exersice} />
-                    {i !== exercises.length - 1 && (
-                      <Divider style={{ marginVertical: spacing.xs }} />
-                    )}
-                  </View>
-                )
-              })}
+          {exerciseOfDay.length > 0 ? (
+            exerciseOfDay.map((exersice, i) => {
+              return (
+                <View key={i} style={{ gap: spacing.xs }}>
+                  <ExerciseDisplay exercise={exersice} />
+                  {i !== exercises.length - 1 && <Divider style={{ marginVertical: spacing.xs }} />}
+                </View>
+              )
+            })
+          ) : (
+            <Text
+              text={`No tienes ejercicios para ${
+                moment(selectedDate).isSame(moment())
+                  ? "hoy"
+                  : "el " + moment(selectedDate).format("DD/MM")
+              }`}
+              preset="invertDefault"
+            />
+          )}
         </View>
       </View>
       <Button

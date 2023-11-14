@@ -7,7 +7,6 @@ import { layout } from "app/theme/global"
 import { Button, Text } from "app/components"
 import moment from "moment"
 import { Divider } from "@rneui/base"
-import { capitalizeString } from "app/utils/text"
 
 interface PlanDisplayProps {
   plan: ExercisePlan
@@ -104,7 +103,7 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
                 {i === 0 || routinesSorted[i - 1].muscle !== r.muscle ? (
                   <View>
                     <Text
-                      text={` ${capitalizeString(r.muscle)}`}
+                      text={` ${r.muscle}`}
                       preset="invertBold"
                       style={styles.firtsColumnRoutine}
                     />

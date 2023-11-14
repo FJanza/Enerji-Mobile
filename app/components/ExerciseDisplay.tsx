@@ -5,6 +5,7 @@ import { Exercise } from "app/Interfaces/Interfaces"
 import { layout } from "app/theme/global"
 import { TextField } from "./TextField"
 import { spacing } from "app/theme"
+import { capitalizeString } from "app/utils/text"
 
 interface Props {
   exercise: Exercise
@@ -14,12 +15,8 @@ const ExerciseDisplay = ({ exercise }: Props) => {
   return (
     <View style={{ gap: spacing.xs }}>
       <View style={layout.rowBetween}>
-        <Text
-          text={`Ejercicio: ${exercise.exercise}`}
-          preset="invertBold"
-          style={styles.titleExercise}
-        />
-        <Text text={exercise.muscle} preset="invertBold" />
+        <Text text={`Ejercicio: ${exercise.exercise}`} preset="invertBold" numberOfLines={2} />
+        <Text text={capitalizeString(exercise.muscle)} preset="invertBold" />
       </View>
       <View style={layout.rowBetween}>
         <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
@@ -64,5 +61,4 @@ const styles = StyleSheet.create({
   textField: {
     width: 55,
   },
-  titleExercise: { maxWidth: 300 },
 })

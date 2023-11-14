@@ -18,13 +18,13 @@ import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 // import { useDispatch } from "react-redux"
 import { layout } from "app/theme/global"
-import { Exercise, UserRegistration } from "app/Interfaces/Interfaces"
+import { UserRegistration } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
 
 import { useDispatch } from "react-redux"
 
-import { setExersices, setUser } from "app/store/user"
+import { setExersicePlans, setExersices, setUser } from "app/store/user"
 import DatePicker from "react-native-date-picker"
 import moment from "moment"
 import { capitalizeString } from "app/utils/text"
@@ -53,49 +53,6 @@ const initialUserRegistration: Partial<UserRegistration> = {
   dietType: "",
   sex: "Femenino",
 }
-// TODO sacar el dummy y traer de supa
-const routineDummy: Exercise[] = [
-  {
-    muscle: "Chest",
-    date: moment().format("DD/MM/yyyy"),
-    weight: 100,
-    email: "thebonitagmer777rexomg@gmail.com",
-    exercise: "Bench Press",
-    idPlan: 101,
-    series: 3,
-    repeat: 10,
-  },
-  {
-    muscle: "Back",
-    date: moment().format("DD/MM/yyyy"),
-    weight: 80,
-    email: "thebonitagmer777rexomg@gmail.com",
-    exercise: "Deadlift",
-    idPlan: 102,
-    series: 4,
-    repeat: 8,
-  },
-  {
-    muscle: "Legs",
-    date: moment().format("DD/MM/yyyy"),
-    weight: 120,
-    email: "thebonitagmer777rexomg@gmail.com",
-    exercise: "Squats",
-    idPlan: 103,
-    series: 3,
-    repeat: 12,
-  },
-  {
-    muscle: "Shoulders",
-    date: moment().add(1, "days").format("DD/MM/yyyy"),
-    weight: 60,
-    email: "thebonitagmer777rexomg@gmail.com",
-    exercise: "Shoulder Press",
-    idPlan: 104,
-    series: 5,
-    repeat: 6,
-  },
-]
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
   const dispatch = useDispatch()
@@ -167,7 +124,57 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       } else {
         setAuthPassword("")
         setAuthEmail("")
+
         // TODO traer informacion de pesos historicos
+
+        const { data: HistoricoPesos, error: errorHistoricoPesos } = await supabase
+          .from("HistoricoPesos")
+          .select(
+            "email,muscle:musculo,exercise:ejercicio,date:fecha,weight:peso,series,repeat:repeticiones,idPlan:id_plan",
+          )
+          .eq("email", authEmail)
+
+        const { data: PlanEjercicioSB, error: errorPlanEjercicio } = await supabase
+          .from("PlanEjercicio")
+          .select("id,email,startDate:desde,endDate:hasta,duration:duracion")
+          // Filters
+          .eq("email", authEmail)
+
+        const PlanesEjercico = []
+
+        for (let i = 0; i < PlanEjercicioSB.length; i++) {
+          const { data: HistoricosPesosPlan } = await supabase
+            .from("HistoricoPesos")
+            .select(
+              "email,muscle:musculo,exercise:ejercicio,date:fecha,weight:peso,series,repeat:repeticiones",
+            )
+            .eq("email", authEmail)
+            .eq("id_plan", PlanEjercicioSB[i].id)
+
+          const unicos = []
+
+          HistoricosPesosPlan.forEach((obj) => {
+            // Buscar si ya existe un objeto con el mismo atributo
+            const index = unicos.findIndex(
+              (el) =>
+                el.exercise === obj.exercise &&
+                moment(el.date).format("dddd") === moment(obj.date).format("dddd"),
+            )
+
+            index === -1 && unicos.push(obj)
+          })
+          console.log({ unicos })
+
+          PlanesEjercico.push({
+            ...PlanEjercicioSB[i],
+            routine: unicos.map((hp) => {
+              return { ...hp, date: moment(hp.date).format("DD/MM/yyyy") }
+            }),
+            startDate: moment(PlanEjercicioSB[i].startDate).format("DD/MM/yyyy"),
+            endDate: moment(PlanEjercicioSB[i].endDate).format("DD/MM/yyyy"),
+          })
+        }
+
         const { data: UserPersonalInformation, error: errorDataBase } = await supabase
           .from("UserPersonalInformation")
           .select(
@@ -175,8 +182,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           )
           .eq("email", authEmail)
 
-        if (errorDataBase?.message) {
-          console.log(errorDataBase.message)
+        if (errorDataBase?.message || errorHistoricoPesos?.message || errorPlanEjercicio?.message) {
+          console.log({
+            errorDB: errorDataBase?.message,
+            errorHP: errorHistoricoPesos?.message,
+            errorPJ: errorPlanEjercicio?.message,
+          })
         } else {
           dispatch(
             setUser({
@@ -188,7 +199,14 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               },
             }),
           )
-          dispatch(setExersices(routineDummy))
+          dispatch(
+            setExersices(
+              HistoricoPesos.map((p) => {
+                return { ...p, date: moment(p.date).format("DD/MM/yyyy") }
+              }),
+            ),
+          )
+          dispatch(setExersicePlans(PlanesEjercico))
           setAuthToken(data.session.access_token)
         }
       }
