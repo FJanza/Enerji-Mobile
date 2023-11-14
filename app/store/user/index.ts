@@ -81,19 +81,36 @@ const slice = createSlice({
       state.exercises = action.payload
     },
     appendExersices: (state, action: PayloadAction<Exercise[]>) => {
-      console.log(action.payload)
-      console.log(state.exercises)
       const newState = {
         ...state,
         exercises: [...state.exercises, ...action.payload],
       }
-      console.log(newState)
+
+      return newState
+    },
+    setExersicePlans: (state, action: PayloadAction<ExercisePlan[]>) => {
+      state.exercisePlans = action.payload
+    },
+    appendExersicePlan: (state, action: PayloadAction<ExercisePlan>) => {
+      const newState = {
+        ...state,
+        exercisePlans: [...state.exercisePlans, action.payload],
+      }
 
       return newState
     },
   },
 })
 
-export const { updateUser, setUser, setAuthToken, logOut, setExersices } = slice.actions
+export const {
+  updateUser,
+  setUser,
+  setAuthToken,
+  logOut,
+  setExersices,
+  appendExersices,
+  setExersicePlans,
+  appendExersicePlan,
+} = slice.actions
 
 export default slice.reducer

@@ -14,7 +14,11 @@ const ExerciseDisplay = ({ exercise }: Props) => {
   return (
     <View style={{ gap: spacing.xs }}>
       <View style={layout.rowBetween}>
-        <Text text={`Ejercicio: ${exercise.exercise}`} preset="invertBold" />
+        <Text
+          text={`Ejercicio: ${exercise.exercise}`}
+          preset="invertBold"
+          style={styles.titleExercise}
+        />
         <Text text={exercise.muscle} preset="invertBold" />
       </View>
       <View style={layout.rowBetween}>
@@ -60,4 +64,5 @@ const styles = StyleSheet.create({
   textField: {
     width: 55,
   },
+  titleExercise: { maxWidth: 300 },
 })

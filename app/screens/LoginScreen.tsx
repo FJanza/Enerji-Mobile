@@ -242,7 +242,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     const { error: errorData } = await supabase.from("UserPersonalInformation").insert([
       {
         email: userRegister.email,
-        fechaNacimiento: moment(userRegister.birthDate, "DD/MM/yyyy").format("DD/MM/yyyy"),
+        fechaNacimiento: moment(userRegister.birthDate, "DD/MM/yyyy").toDate(),
         nombre: capitalizeString(userRegister.name),
         apellido: capitalizeString(userRegister.lastName),
         altura: userRegister.height,

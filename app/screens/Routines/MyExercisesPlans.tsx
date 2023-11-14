@@ -4,110 +4,14 @@ import { Button, Card, Screen, Text } from "app/components"
 import { navigate } from "app/navigators"
 import { colors, spacing } from "app/theme"
 import { layout } from "app/theme/global"
-import moment from "moment"
-import { ExercisePlan } from "app/Interfaces/Interfaces"
-import PlanDisplay from "../../components/PlanDisplay"
 
-export const planDummys: ExercisePlan[] = [
-  {
-    id: 2,
-    duration: 2,
-    startDate: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-    endDate: moment("30/06/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-    routine: [
-      {
-        muscle: "Chest",
-        date: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user1@example.com",
-        exercise: "Bench Press",
-        idPlan: 103,
-        series: 3,
-        repeat: 10,
-      },
-      {
-        muscle: "Back",
-        date: moment("29/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user2@example.com",
-        exercise: "Deadlift",
-        idPlan: 103,
-        series: 4,
-        repeat: 8,
-      },
-      {
-        muscle: "Legs",
-        date: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        series: 3,
-        repeat: 12,
-      },
-      {
-        muscle: "Legs",
-        date: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        series: 3,
-        repeat: 12,
-      },
-    ],
-  },
-  {
-    duration: 3,
-    id: 4,
-    startDate: moment("30/01/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-    endDate: moment("30/03/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-    routine: [
-      {
-        muscle: "Chest",
-        date: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user1@example.com",
-        exercise: "Bench Press",
-        idPlan: 103,
-        series: 3,
-        repeat: 10,
-      },
-      {
-        muscle: "Back",
-        date: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user2@example.com",
-        exercise: "Deadlift",
-        idPlan: 103,
-        series: 4,
-        repeat: 8,
-      },
-      {
-        muscle: "Legs",
-        date: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        series: 3,
-        repeat: 12,
-      },
-      {
-        muscle: "Legs",
-        date: moment("30/04/2023", "DD/MM/yyyy").format("DD/MM/yyyy"),
-        weight: 100,
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        series: 3,
-        repeat: 12,
-      },
-    ],
-  },
-]
+import PlanDisplay from "../../components/PlanDisplay"
+import { useSelector } from "react-redux"
+import { RootState } from "app/store"
 
 const MyExercisesPlans = () => {
+  const { exercisePlans } = useSelector((state: RootState) => state.user)
+
   return (
     <Screen
       preset="scroll"
@@ -122,12 +26,14 @@ const MyExercisesPlans = () => {
               navigate("MyRoutines")
             }}
             text="Mis rutinas"
+            preset="reversed"
           />
           <Button
             onPress={() => {
               navigate("GeneratorExercisePlan")
             }}
             text="Generador de planes"
+            preset="reversed"
           />
         </View>
         <Card
@@ -142,9 +48,17 @@ const MyExercisesPlans = () => {
           }
           ContentComponent={
             <View style={{ padding: spacing.xxs, gap: spacing.sm }}>
-              {planDummys.map((p, i) => {
-                return <PlanDisplay plan={p} key={`${p.id}+${i}`} />
-              })}
+              {exercisePlans.length > 0 ? (
+                exercisePlans.map((p, i) => {
+                  return <PlanDisplay plan={p} key={`${p.id}+${i}`} />
+                })
+              ) : (
+                <Text
+                  text="No tienes planes todavia, prueba generando uno!"
+                  preset="invertDefault"
+                  style={{ padding: spacing.xs }}
+                />
+              )}
             </View>
           }
         />

@@ -17,7 +17,9 @@ interface PlanDisplayProps {
 const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
   const [showMore, setShowMore] = useState(false)
 
-  const routinesSorted = plan.routine.sort(
+  const rutinas = [...plan.routine]
+
+  const routinesSorted = rutinas.sort(
     (a, b) =>
       moment(a.date, "DD/MM/yyyy").toDate().getTime() -
       moment(b.date, "DD/MM/yyyy").toDate().getTime(),
@@ -98,7 +100,7 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
                   style={{ marginTop: spacing.xs }}
                 />
               ) : undefined}
-              <View>
+              <View style={{ gap: spacing.xxs }}>
                 {i === 0 || routinesSorted[i - 1].muscle !== r.muscle ? (
                   <View>
                     <Text
