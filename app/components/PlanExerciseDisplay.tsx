@@ -11,12 +11,12 @@ import { getExercisePlansSP, getHistoricWeights, supabase } from "app/services/s
 import { useDispatch } from "react-redux"
 import { setExersicePlans, setExersices } from "app/store/user"
 
-interface PlanDisplayProps {
+interface PlanExerciseDisplayProps {
   plan: ExercisePlan
   showDeleteButton?: boolean
 }
 
-const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
+const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisplayProps) => {
   const [showMore, setShowMore] = useState(false)
 
   const rutinas = [...plan.routine]
@@ -173,7 +173,7 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
   )
 }
 
-export default PlanDisplay
+export default PlanExerciseDisplay
 
 const styles = StyleSheet.create({
   botones: { flex: 1.5, gap: spacing.sm },

@@ -4,11 +4,11 @@ import React from "react"
 import { Image, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
-import { DemoDebugScreen } from "../screens"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
 import Profile from "app/screens/Profile"
 import { RoutinesNavigator } from "./RoutinesNavigator"
+import { RecipesNavigator } from "./RecipesNavigator"
 
 export type WindowsList = {
   Perfil: undefined
@@ -62,7 +62,7 @@ export function HomeNavigator() {
 
       <Tab.Screen
         name="PlanAlimenticio"
-        component={DemoDebugScreen}
+        component={RecipesNavigator}
         options={{
           tabBarLabel: "Alimentación",
           tabBarIcon: ({ focused }) => (

@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
-import { Exercise, ExercisePlan } from "app/Interfaces/Interfaces"
+import { Exercise, ExercisePlan, Recipe } from "app/Interfaces/Interfaces"
 
 type PersonalInformation = {
   email: string
@@ -18,6 +18,8 @@ type User = {
   personalInformation: PersonalInformation
   exercisePlans: ExercisePlan[]
   exercises: Exercise[]
+  recipePlans: Recipe[]
+  recipes: Recipe[]
 }
 
 const stateInit: User = {
@@ -34,6 +36,8 @@ const stateInit: User = {
   },
   exercisePlans: [],
   exercises: [],
+  recipePlans: [],
+  recipes: [],
 }
 
 const slice = createSlice({

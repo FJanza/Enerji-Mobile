@@ -15,6 +15,27 @@ export interface UserRegistration extends User {
   password: string
 }
 
+export interface Recipe {
+  email: string
+  food: string
+  cal: string
+  protein: string
+  recipe: string
+  ingredients: string[]
+  done: boolean
+  date: string
+  idPlan: string
+  dayMoment: string
+}
+export interface RecipePlan {
+  id: number
+  email?: string
+  recipes: Recipe[]
+  startDate: string
+  endDate: string
+  duration: number
+}
+
 export interface Exercise {
   email: string
   muscle: string

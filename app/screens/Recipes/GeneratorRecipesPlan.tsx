@@ -18,12 +18,12 @@ import DatePicker from "react-native-date-picker"
 import { showAlert } from "app/utils/alert"
 import { appendExersicePlan, appendExersices } from "app/store/user"
 
-const GeneratorExercisePlan = () => {
+const GeneratorRecipesPlan = () => {
   const [trainingType, setTrainingType] = useState()
   const [duration, setDuration] = useState<string>()
   const [planGenerated, setPlanGenerated] = useState<ExercisePlan>(undefined)
   const [routines, setRoutines] = useState<Exercise[]>([])
-  const [daysOfWeek, setDaysOfWeek] = useState([])
+  const [daysOfWeek] = useState([])
   const [trainingTypes, setTrainingTypes] = useState([])
   const [bodyTypes, setBodyTypes] = useState([])
   const [loadingGenerate, setLoadingGenerate] = useState(false)
@@ -299,14 +299,7 @@ const GeneratorExercisePlan = () => {
             </View>
           </View>
         </View>
-        <View style={{ gap: spacing.xxs }}>
-          <Text text="Seleccionar dias de la semana" preset="invertBold" />
-          <SelectDays
-            onDaysChanges={(days) => {
-              setDaysOfWeek(days)
-            }}
-          />
-        </View>
+
         <Button
           disabled={
             loadingGenerate || !(trainingType !== "" && duration !== "" && daysOfWeek.length !== 0)
@@ -343,7 +336,7 @@ const GeneratorExercisePlan = () => {
   )
 }
 
-export default GeneratorExercisePlan
+export default GeneratorRecipesPlan
 
 const styles = StyleSheet.create({
   container: {

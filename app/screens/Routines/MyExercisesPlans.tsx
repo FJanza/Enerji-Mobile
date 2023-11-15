@@ -5,7 +5,7 @@ import { navigate } from "app/navigators"
 import { colors, spacing } from "app/theme"
 import { layout } from "app/theme/global"
 
-import PlanDisplay from "../../components/PlanDisplay"
+import PlanExerciseDisplay from "../../components/PlanExerciseDisplay"
 import { useSelector } from "react-redux"
 import { RootState } from "app/store"
 import { ROUTES } from "app/utils/routes"
@@ -51,7 +51,7 @@ const MyExercisesPlans = () => {
             <View style={{ padding: spacing.xxs, gap: spacing.sm }}>
               {exercisePlans.length > 0 ? (
                 exercisePlans.map((p, i) => {
-                  return <PlanDisplay plan={p} key={`${p.id}+${i}`} />
+                  return <PlanExerciseDisplay plan={p} key={`${p.id}+${i}`} />
                 })
               ) : (
                 <Text
