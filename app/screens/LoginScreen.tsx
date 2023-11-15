@@ -163,7 +163,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
             index === -1 && unicos.push(obj)
           })
-          console.log({ unicos })
 
           PlanesEjercico.push({
             ...PlanEjercicioSB[i],

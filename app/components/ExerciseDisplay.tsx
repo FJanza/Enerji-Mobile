@@ -9,9 +9,10 @@ import { capitalizeString } from "app/utils/text"
 
 interface Props {
   exercise: Exercise
+  changeWeight: (weight: string) => void
 }
 
-const ExerciseDisplay = ({ exercise }: Props) => {
+const ExerciseDisplay = ({ exercise, changeWeight }: Props) => {
   return (
     <View style={{ gap: spacing.xs }}>
       <View style={layout.rowBetween}>
@@ -36,7 +37,13 @@ const ExerciseDisplay = ({ exercise }: Props) => {
       <View style={layout.rowBetween}>
         <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
           <View style={styles.textField}>
-            <TextField placeholder={`${exercise.weight}`} />
+            <TextField
+              keyboardType="decimal-pad"
+              value={`${exercise.weight}`}
+              onChangeText={(e) => {
+                !e.includes(",") && changeWeight(e)
+              }}
+            />
           </View>
           <View style={layout.fill}>
             <Text text="Kg" preset="invertDefault" />

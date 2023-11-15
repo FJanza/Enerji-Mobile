@@ -8,19 +8,56 @@ import moment from "moment"
 import { numToDayString } from "app/utils/day"
 import { Divider } from "@rneui/themed"
 import ExerciseDisplay from "app/components/ExerciseDisplay"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "app/store"
+import { supabase } from "app/services/supabaseService"
+import { showAlert } from "app/utils/alert"
+import { Exercise } from "app/Interfaces/Interfaces"
+import { setExersices } from "app/store/user"
 
 const MyRutines = () => {
   const [selectedDate, setSelectedDate] = useState<Date>()
 
-  const [exerciseOfDay, setExerciseOfDay] = useState([])
+  const [exercisesOfDay, setExercisesOfDay] = useState<Exercise[]>([])
 
   const { exercises } = useSelector((state: RootState) => state.user)
 
+  const [loadingSaveWeights, setLoadingSaveWeights] = useState(false)
+
+  const dispatch = useDispatch()
+
   useEffect(() => {
-    setExerciseOfDay(exercises.filter((ex) => moment(ex.date, "DD/MM/yyyy").isSame(selectedDate)))
+    setExercisesOfDay(exercises.filter((ex) => moment(ex.date, "DD/MM/yyyy").isSame(selectedDate)))
   }, [selectedDate])
+
+  const handleSaveWeights = async () => {
+    setLoadingSaveWeights(true)
+    for (let i = 0; i < exercisesOfDay.length; i++) {
+      const { error } = await supabase
+        .from("HistoricoPesos")
+        .update({ peso: exercisesOfDay[i].weight })
+        .eq("ejercicio", exercisesOfDay[i].exercise)
+        .eq("fecha", moment(exercisesOfDay[i].date, "DD/MM/yyyy").format("yyyy-MM-DD"))
+        .eq("id_plan", exercisesOfDay[i].idPlan)
+        .select()
+
+      error?.message && showAlert(error.message)
+    }
+
+    const exercisesUpdated = exercises.map((ex) => {
+      const j = exercisesOfDay.findIndex(
+        (exOfDay: Exercise) => exOfDay.date === ex.date && exOfDay.exercise === ex.exercise,
+      )
+      if (j > 0) {
+        return { ...ex, weight: exercisesOfDay[j].weight }
+      } else {
+        return ex
+      }
+    }) as Exercise[]
+
+    dispatch(setExersices(exercisesUpdated))
+    setLoadingSaveWeights(false)
+  }
 
   return (
     <Screen
@@ -59,11 +96,20 @@ const MyRutines = () => {
           />
         </View>
         <View style={styles.cardBody}>
-          {exerciseOfDay.length > 0 ? (
-            exerciseOfDay.map((exersice, i) => {
+          {exercisesOfDay.length > 0 ? (
+            exercisesOfDay.map((exersice, i) => {
               return (
                 <View key={i} style={{ gap: spacing.xs }}>
-                  <ExerciseDisplay exercise={exersice} />
+                  <ExerciseDisplay
+                    exercise={exersice}
+                    changeWeight={(e) => {
+                      setExercisesOfDay((prev) =>
+                        prev.map((ex) => {
+                          return ex === exersice ? { ...exersice, weight: Number(e) } : ex
+                        }),
+                      )
+                    }}
+                  />
                   {i !== exercises.length - 1 && <Divider style={{ marginVertical: spacing.xs }} />}
                 </View>
               )
@@ -81,10 +127,11 @@ const MyRutines = () => {
         </View>
       </View>
       <Button
+        disabled={loadingSaveWeights}
         onPress={() => {
-          navigate("MyExercisesPlanNavigator", { screen: "MyExercisePlans" })
+          handleSaveWeights()
         }}
-        text="Guardar pesos"
+        text={loadingSaveWeights ? "Guardando pesos" : "Guardar pesos"}
       />
     </Screen>
   )

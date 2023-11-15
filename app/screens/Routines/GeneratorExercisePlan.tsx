@@ -150,7 +150,7 @@ const GeneratorExercisePlan = () => {
       }
 
       // eslint-disable-next-line prefer-spread
-      const routines2 = [].concat.apply([], routines)
+      const concatenatedRoutines = [].concat.apply([], routines)
 
       // Usar un Set para almacenar etiquetas únicas
       const uniqueDay = new Set()
@@ -175,8 +175,7 @@ const GeneratorExercisePlan = () => {
         id: 1,
         duration: Number(duration),
       })
-      setRoutines(routines2)
-      console.log(routines2)
+      setRoutines(concatenatedRoutines)
       showAlert("generado correctamente")
     } else {
       showAlert("Error al generar, intentelo de nuevo")
