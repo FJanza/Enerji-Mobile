@@ -1,4 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { Exercise, ExercisePlan } from "app/Interfaces/Interfaces"
 
 type PersonalInformation = {
   email: string
@@ -15,6 +16,8 @@ type PersonalInformation = {
 type User = {
   authToken?: string
   personalInformation: PersonalInformation
+  exercisePlans: ExercisePlan[]
+  exercises: Exercise[]
 }
 
 const stateInit: User = {
@@ -29,6 +32,8 @@ const stateInit: User = {
     bodyType: "",
     dietType: "",
   },
+  exercisePlans: [],
+  exercises: [],
 }
 
 const slice = createSlice({
@@ -50,6 +55,8 @@ const slice = createSlice({
         bodyType: "",
         dietType: "",
       }
+      state.exercisePlans = []
+      state.exercises = []
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       const newState = {
@@ -70,9 +77,40 @@ const slice = createSlice({
       }
       return newState
     },
+    setExersices: (state, action: PayloadAction<Exercise[]>) => {
+      state.exercises = action.payload
+    },
+    appendExersices: (state, action: PayloadAction<Exercise[]>) => {
+      const newState = {
+        ...state,
+        exercises: [...state.exercises, ...action.payload],
+      }
+
+      return newState
+    },
+    setExersicePlans: (state, action: PayloadAction<ExercisePlan[]>) => {
+      state.exercisePlans = action.payload
+    },
+    appendExersicePlan: (state, action: PayloadAction<ExercisePlan>) => {
+      const newState = {
+        ...state,
+        exercisePlans: [...state.exercisePlans, action.payload],
+      }
+
+      return newState
+    },
   },
 })
 
-export const { updateUser, setUser, setAuthToken, logOut } = slice.actions
+export const {
+  updateUser,
+  setUser,
+  setAuthToken,
+  logOut,
+  setExersices,
+  appendExersices,
+  setExersicePlans,
+  appendExersicePlan,
+} = slice.actions
 
 export default slice.reducer

@@ -1,64 +1,63 @@
 import { StyleSheet, View } from "react-native"
-import React, { useState } from "react"
-import { Button, Screen, Text, TextField } from "app/components"
+import React, { useEffect, useState } from "react"
+import { Button, Screen, Text } from "app/components"
 import { navigate } from "app/navigators"
 import { colors, spacing } from "app/theme"
 import DatePicker from "react-native-modern-datepicker"
 import moment from "moment"
 import { numToDayString } from "app/utils/day"
-import { layout } from "app/theme/global"
-import { Exersice } from "app/Interfaces/Interfaces"
 import { Divider } from "@rneui/themed"
-
-const routineDummy: Exersice[] = [
-  {
-    id: 1,
-    muscle: "Chest",
-    day: "Monday",
-    weight: "100",
-    email: "user1@example.com",
-    exercise: "Bench Press",
-    idPlan: 101,
-    serie: 3,
-    repetitions: 10,
-  },
-  {
-    id: 2,
-    muscle: "Back",
-    day: "Tuesday",
-    weight: "80",
-    email: "user2@example.com",
-    exercise: "Deadlift",
-    idPlan: 102,
-    serie: 4,
-    repetitions: 8,
-  },
-  {
-    id: 3,
-    muscle: "Legs",
-    day: "Wednesday",
-    weight: "120",
-    email: "user3@example.com",
-    exercise: "Squats",
-    idPlan: 103,
-    serie: 3,
-    repetitions: 12,
-  },
-  {
-    id: 4,
-    muscle: "Shoulders",
-    day: "Thursday",
-    weight: "60",
-    email: "user4@example.com",
-    exercise: "Shoulder Press",
-    idPlan: 104,
-    serie: 5,
-    repetitions: 6,
-  },
-]
+import ExerciseDisplay from "app/components/ExerciseDisplay"
+import { useDispatch, useSelector } from "react-redux"
+import { RootState } from "app/store"
+import { supabase } from "app/services/supabaseService"
+import { showAlert } from "app/utils/alert"
+import { Exercise } from "app/Interfaces/Interfaces"
+import { setExersices } from "app/store/user"
 
 const MyRutines = () => {
   const [selectedDate, setSelectedDate] = useState<Date>()
+
+  const [exercisesOfDay, setExercisesOfDay] = useState<Exercise[]>([])
+
+  const { exercises } = useSelector((state: RootState) => state.user)
+
+  const [loadingSaveWeights, setLoadingSaveWeights] = useState(false)
+
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    setExercisesOfDay(exercises.filter((ex) => moment(ex.date, "DD/MM/yyyy").isSame(selectedDate)))
+  }, [selectedDate])
+
+  const handleSaveWeights = async () => {
+    setLoadingSaveWeights(true)
+    for (let i = 0; i < exercisesOfDay.length; i++) {
+      const { error } = await supabase
+        .from("HistoricoPesos")
+        .update({ peso: exercisesOfDay[i].weight })
+        .eq("ejercicio", exercisesOfDay[i].exercise)
+        .eq("fecha", moment(exercisesOfDay[i].date, "DD/MM/yyyy").format("yyyy-MM-DD"))
+        .eq("id_plan", exercisesOfDay[i].idPlan)
+        .select()
+
+      error?.message && showAlert(error.message)
+    }
+
+    const exercisesUpdated = exercises.map((ex) => {
+      const j = exercisesOfDay.findIndex(
+        (exOfDay: Exercise) => exOfDay.date === ex.date && exOfDay.exercise === ex.exercise,
+      )
+      if (j > 0) {
+        return { ...ex, weight: exercisesOfDay[j].weight }
+      } else {
+        return ex
+      }
+    }) as Exercise[]
+
+    dispatch(setExersices(exercisesUpdated))
+    setLoadingSaveWeights(false)
+  }
 
   return (
     <Screen
@@ -68,6 +67,12 @@ const MyRutines = () => {
       statusBarStyle="light"
     >
       <DatePicker
+        options={{
+          textHeaderColor: colors.palette.primary600,
+          selectedTextColor: "#fff",
+          mainColor: colors.palette.primary600,
+        }}
+        selected={moment(selectedDate).format("YYYY-MM-DD")}
         onSelectedChange={(date: string) => {
           const dateDate = moment(date, "YYYY/MM/DD").toDate()
           !moment(selectedDate).isSame(dateDate) && setSelectedDate(dateDate)
@@ -91,61 +96,42 @@ const MyRutines = () => {
           />
         </View>
         <View style={styles.cardBody}>
-          {routineDummy.map((r, i) => {
-            return (
-              <View key={i} style={{ gap: spacing.xs }}>
-                <View style={{ gap: spacing.xs }}>
-                  <View style={layout.rowBetween}>
-                    <Text text={`Ejercicio: ${r.exercise}`} preset="invertBold" />
-                    <Text text={r.muscle} preset="invertBold" />
-                  </View>
-                  <View style={layout.rowBetween}>
-                    <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
-                      <View style={[layout.fill, { paddingLeft: spacing.xl }]}>
-                        <Text text="Peso" preset="invertDefault" />
-                      </View>
-                    </View>
-                    <View style={[layout.centerAllWidth, layout.row]}>
-                      <View style={layout.centerAllWidth}>
-                        <Text text={`Reps`} preset="invertDefault" />
-                      </View>
-                      <View style={layout.centerAllWidth}>
-                        <Text text={`Series`} preset="invertDefault" />
-                      </View>
-                    </View>
-                  </View>
-                  <View style={layout.rowBetween}>
-                    <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
-                      <View style={styles.textField}>
-                        <TextField placeholder={`${r.weight}`} />
-                      </View>
-                      <View style={layout.fill}>
-                        <Text text="Kg" preset="invertDefault" />
-                      </View>
-                    </View>
-                    <View style={[layout.centerAllWidth, layout.row]}>
-                      <View style={layout.centerAllWidth}>
-                        <Text text={`${r.serie}`} preset="invertDefault" />
-                      </View>
-                      <View style={layout.centerAllWidth}>
-                        <Text text={`${r.repetitions}`} preset="invertDefault" />
-                      </View>
-                    </View>
-                  </View>
+          {exercisesOfDay.length > 0 ? (
+            exercisesOfDay.map((exersice, i) => {
+              return (
+                <View key={i} style={{ gap: spacing.xs }}>
+                  <ExerciseDisplay
+                    exercise={exersice}
+                    changeWeight={(e) => {
+                      setExercisesOfDay((prev) =>
+                        prev.map((ex) => {
+                          return ex === exersice ? { ...exersice, weight: Number(e) } : ex
+                        }),
+                      )
+                    }}
+                  />
+                  {i !== exercises.length - 1 && <Divider style={{ marginVertical: spacing.xs }} />}
                 </View>
-                {i !== routineDummy.length - 1 && (
-                  <Divider style={{ marginVertical: spacing.xs }} />
-                )}
-              </View>
-            )
-          })}
+              )
+            })
+          ) : (
+            <Text
+              text={`No tienes ejercicios para ${
+                moment(selectedDate).isSame(moment())
+                  ? "hoy"
+                  : "el " + moment(selectedDate).format("DD/MM")
+              }`}
+              preset="invertDefault"
+            />
+          )}
         </View>
       </View>
       <Button
+        disabled={loadingSaveWeights}
         onPress={() => {
-          navigate("MyExercisesPlanNavigator", { screen: "MyExercisePlans" })
+          handleSaveWeights()
         }}
-        text="Guardar pesos"
+        text={loadingSaveWeights ? "Guardando pesos" : "Guardar pesos"}
       />
     </Screen>
   )
@@ -178,8 +164,5 @@ const styles = StyleSheet.create({
   datePicker: {
     backgroundColor: colors.palette.neutral100,
     borderRadius: 20,
-  },
-  textField: {
-    width: 55,
   },
 })

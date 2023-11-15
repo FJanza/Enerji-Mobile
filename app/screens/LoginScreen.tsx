@@ -21,13 +21,14 @@ import { layout } from "app/theme/global"
 import { UserRegistration } from "app/Interfaces/Interfaces"
 import { supabase } from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
-import Toast from "react-native-simple-toast"
+
 import { useDispatch } from "react-redux"
 
-import { setUser } from "app/store/user"
+import { setExersicePlans, setExersices, setUser } from "app/store/user"
 import DatePicker from "react-native-date-picker"
 import moment from "moment"
 import { capitalizeString } from "app/utils/text"
+import { showAlert } from "app/utils/alert"
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
@@ -39,19 +40,6 @@ const windowHeight = Dimensions.get("window").height
 // TODO pasar a env
 const LOGIN_WITH_AUTH = true
 // TODO pasar a env
-
-// const dummyPersonalInformation: User = {
-//   email: "thebonitagamer777rexomg@gmail.com",
-//   birthDate: "13/11/2014",
-//   name: "Bonita",
-//   lastName: "Janza",
-//   height: 120,
-//   weight: 63,
-//   objective: "volumen",
-//   bodyType: "ectomorfo",
-//   dietType: "Equilibrada",
-//   sex: "female",
-// }
 
 const initialUserRegistration: Partial<UserRegistration> = {
   email: "",
@@ -87,10 +75,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     authenticationStore: { authEmail, setAuthEmail, setAuthToken },
   } = useStores()
 
-  const showAlert = (texto: string) => {
-    Toast.show(texto, Toast.SHORT)
-  }
-
   const dataForRegister = async () => {
     const { data: TipoDieta, error: errorTipoDieta } = await supabase
       .from("TipoDieta")
@@ -114,17 +98,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }
 
   useEffect(() => {
-    console.log({
-      userRegister,
-    })
-
-    // Here is where you could fetch credentials from keychain or storage
-    // and pre-fill the form fields.
     setAuthEmail("")
     setAuthPassword("")
     dataForRegister()
 
-    // Return a "cleanup" function that React will run when the component unmounts
     return () => {
       setAuthPassword("")
       setAuthEmail("")
@@ -147,7 +124,56 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       } else {
         setAuthPassword("")
         setAuthEmail("")
-        // TODO traer informacion de tabla UserPersonalInformation
+
+        // TODO traer informacion de pesos historicos
+
+        const { data: HistoricoPesos, error: errorHistoricoPesos } = await supabase
+          .from("HistoricoPesos")
+          .select(
+            "email,muscle:musculo,exercise:ejercicio,date:fecha,weight:peso,series,repeat:repeticiones,idPlan:id_plan",
+          )
+          .eq("email", authEmail)
+
+        const { data: PlanEjercicioSB, error: errorPlanEjercicio } = await supabase
+          .from("PlanEjercicio")
+          .select("id,email,startDate:desde,endDate:hasta,duration:duracion")
+          // Filters
+          .eq("email", authEmail)
+
+        const PlanesEjercico = []
+
+        for (let i = 0; i < PlanEjercicioSB.length; i++) {
+          const { data: HistoricosPesosPlan } = await supabase
+            .from("HistoricoPesos")
+            .select(
+              "email,muscle:musculo,exercise:ejercicio,date:fecha,weight:peso,series,repeat:repeticiones",
+            )
+            .eq("email", authEmail)
+            .eq("id_plan", PlanEjercicioSB[i].id)
+
+          const unicos = []
+
+          HistoricosPesosPlan.forEach((obj) => {
+            // Buscar si ya existe un objeto con el mismo atributo
+            const index = unicos.findIndex(
+              (el) =>
+                el.exercise === obj.exercise &&
+                moment(el.date).format("dddd") === moment(obj.date).format("dddd"),
+            )
+
+            index === -1 && unicos.push(obj)
+          })
+
+          PlanesEjercico.push({
+            ...PlanEjercicioSB[i],
+            routine: unicos.map((hp) => {
+              return { ...hp, date: moment(hp.date).format("DD/MM/yyyy") }
+            }),
+            startDate: moment(PlanEjercicioSB[i].startDate).format("DD/MM/yyyy"),
+            endDate: moment(PlanEjercicioSB[i].endDate).format("DD/MM/yyyy"),
+          })
+        }
+
         const { data: UserPersonalInformation, error: errorDataBase } = await supabase
           .from("UserPersonalInformation")
           .select(
@@ -155,10 +181,31 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           )
           .eq("email", authEmail)
 
-        if (errorDataBase?.message) {
-          console.log(errorDataBase.message)
+        if (errorDataBase?.message || errorHistoricoPesos?.message || errorPlanEjercicio?.message) {
+          console.log({
+            errorDB: errorDataBase?.message,
+            errorHP: errorHistoricoPesos?.message,
+            errorPJ: errorPlanEjercicio?.message,
+          })
         } else {
-          dispatch(setUser({ personalInformation: { ...UserPersonalInformation[0] } }))
+          dispatch(
+            setUser({
+              personalInformation: {
+                ...UserPersonalInformation[0],
+                birthDate: moment(UserPersonalInformation[0].birthDate, "yyyy-MM-DD").format(
+                  "DD/MM/yyyy",
+                ),
+              },
+            }),
+          )
+          dispatch(
+            setExersices(
+              HistoricoPesos.map((p) => {
+                return { ...p, date: moment(p.date).format("DD/MM/yyyy") }
+              }),
+            ),
+          )
+          dispatch(setExersicePlans(PlanesEjercico))
           setAuthToken(data.session.access_token)
         }
       }
@@ -201,12 +248,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   )
 
   const handleRegister = async () => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: userRegister.email,
       password: userRegister.password,
     })
-    // TODO sacar clg para presentar
-    console.log({ data, error })
     if (error?.message) {
       showAlert(error.message)
     }

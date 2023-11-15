@@ -4,173 +4,15 @@ import { Button, Card, Screen, Text } from "app/components"
 import { navigate } from "app/navigators"
 import { colors, spacing } from "app/theme"
 import { layout } from "app/theme/global"
-import moment from "moment"
-import { ExercisePlan } from "app/Interfaces/Interfaces"
-import PlanDisplay from "./PlanDisplay"
 
-export const planDummys: ExercisePlan[] = [
-  {
-    duration: 2,
-    id: "103",
-    title: "titulo1",
-    startDate: moment("30/04/2023", "DD/MM/yyyy").toDate(),
-    endDate: moment("30/06/2023", "DD/MM/yyyy").toDate(),
-    routine: [
-      {
-        id: 1,
-        muscle: "Chest",
-        day: "Monday",
-        weight: "100",
-        email: "user1@example.com",
-        exercise: "Bench Press",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 10,
-      },
-      {
-        id: 2,
-        muscle: "Back",
-        day: "Tuesday",
-        weight: "80",
-        email: "user2@example.com",
-        exercise: "Deadlift",
-        idPlan: 103,
-        serie: 4,
-        repetitions: 8,
-      },
-      {
-        id: 3,
-        muscle: "Legs",
-        day: "Wednesday",
-        weight: "120",
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 12,
-      },
-      {
-        id: 4,
-        muscle: "Legs",
-        day: "Wednesday",
-        weight: "120",
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 12,
-      },
-    ],
-  },
-  {
-    duration: 3,
-    id: "103",
-    title: "titulo1",
-    startDate: moment("30/01/2023", "DD/MM/yyyy").toDate(),
-    endDate: moment("30/03/2023", "DD/MM/yyyy").toDate(),
-    routine: [
-      {
-        id: 1,
-        muscle: "Chest",
-        day: "Monday",
-        weight: "100",
-        email: "user1@example.com",
-        exercise: "Bench Press",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 10,
-      },
-      {
-        id: 2,
-        muscle: "Back",
-        day: "Tuesday",
-        weight: "80",
-        email: "user2@example.com",
-        exercise: "Deadlift",
-        idPlan: 103,
-        serie: 4,
-        repetitions: 8,
-      },
-      {
-        id: 3,
-        muscle: "Legs",
-        day: "Wednesday",
-        weight: "120",
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 12,
-      },
-      {
-        id: 4,
-        muscle: "Legs",
-        day: "Wednesday",
-        weight: "120",
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 12,
-      },
-    ],
-  },
-  {
-    duration: 2,
-    id: "103",
-    title: "titulo1",
-    startDate: moment("30/10/2023", "DD/MM/yyyy").toDate(),
-    endDate: moment("30/12/2023", "DD/MM/yyyy").toDate(),
-    routine: [
-      {
-        id: 1,
-        muscle: "Chest",
-        day: "Monday",
-        weight: "100",
-        email: "user1@example.com",
-        exercise: "Bench Press",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 10,
-      },
-      {
-        id: 2,
-        muscle: "Back",
-        day: "Tuesday",
-        weight: "80",
-        email: "user2@example.com",
-        exercise: "Deadlift",
-        idPlan: 103,
-        serie: 4,
-        repetitions: 8,
-      },
-      {
-        id: 3,
-        muscle: "Legs",
-        day: "Wednesday",
-        weight: "120",
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 12,
-      },
-      {
-        id: 4,
-        muscle: "Legs",
-        day: "Wednesday",
-        weight: "120",
-        email: "user3@example.com",
-        exercise: "Squats",
-        idPlan: 103,
-        serie: 3,
-        repetitions: 12,
-      },
-    ],
-  },
-]
+import PlanDisplay from "../../components/PlanDisplay"
+import { useSelector } from "react-redux"
+import { RootState } from "app/store"
+import { ROUTES } from "app/utils/routes"
 
 const MyExercisesPlans = () => {
+  const { exercisePlans } = useSelector((state: RootState) => state.user)
+
   return (
     <Screen
       preset="scroll"
@@ -182,15 +24,17 @@ const MyExercisesPlans = () => {
         <View style={layout.rowBetween}>
           <Button
             onPress={() => {
-              navigate("MyRoutines")
+              navigate(ROUTES.MY_ROUTINES)
             }}
             text="Mis rutinas"
+            preset="reversed"
           />
           <Button
             onPress={() => {
-              navigate("GeneratorExercisePlan")
+              navigate(ROUTES.GENERATOR_EXERCISE_PLAN)
             }}
             text="Generador de planes"
+            preset="reversed"
           />
         </View>
         <Card
@@ -205,9 +49,17 @@ const MyExercisesPlans = () => {
           }
           ContentComponent={
             <View style={{ padding: spacing.xxs, gap: spacing.sm }}>
-              {planDummys.map((p, i) => {
-                return <PlanDisplay plan={p} key={`${p.title}+${i}`} />
-              })}
+              {exercisePlans.length > 0 ? (
+                exercisePlans.map((p, i) => {
+                  return <PlanDisplay plan={p} key={`${p.id}+${i}`} />
+                })
+              ) : (
+                <Text
+                  text="No tienes planes todavia, prueba generando uno!"
+                  preset="invertDefault"
+                  style={{ padding: spacing.xs }}
+                />
+              )}
             </View>
           }
         />
