@@ -19,7 +19,7 @@ import { colors, spacing } from "../theme"
 // import { useDispatch } from "react-redux"
 import { layout } from "app/theme/global"
 import { UserRegistration } from "app/Interfaces/Interfaces"
-import { supabase } from "app/services/supabaseService"
+import { getExercisePlansSP, getHistoricWeights, supabase } from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
 
 import { useDispatch } from "react-redux"
@@ -127,52 +127,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
         // TODO traer informacion de pesos historicos
 
-        const { data: HistoricoPesos, error: errorHistoricoPesos } = await supabase
-          .from("HistoricoPesos")
-          .select(
-            "email,muscle:musculo,exercise:ejercicio,date:fecha,weight:peso,series,repeat:repeticiones,idPlan:id_plan",
-          )
-          .eq("email", authEmail)
+        const HistoricoPesos = await getHistoricWeights(authEmail)
 
-        const { data: PlanEjercicioSB, error: errorPlanEjercicio } = await supabase
-          .from("PlanEjercicio")
-          .select("id,email,startDate:desde,endDate:hasta,duration:duracion")
-          // Filters
-          .eq("email", authEmail)
-
-        const PlanesEjercico = []
-
-        for (let i = 0; i < PlanEjercicioSB.length; i++) {
-          const { data: HistoricosPesosPlan } = await supabase
-            .from("HistoricoPesos")
-            .select(
-              "email,muscle:musculo,exercise:ejercicio,date:fecha,weight:peso,series,repeat:repeticiones",
-            )
-            .eq("email", authEmail)
-            .eq("id_plan", PlanEjercicioSB[i].id)
-
-          const unicos = []
-
-          HistoricosPesosPlan.forEach((obj) => {
-            // Buscar si ya existe un objeto con el mismo atributo
-            const index = unicos.findIndex(
-              (el) =>
-                el.exercise === obj.exercise &&
-                moment(el.date).format("dddd") === moment(obj.date).format("dddd"),
-            )
-
-            index === -1 && unicos.push(obj)
-          })
-
-          PlanesEjercico.push({
-            ...PlanEjercicioSB[i],
-            routine: unicos.map((hp) => {
-              return { ...hp, date: moment(hp.date).format("DD/MM/yyyy") }
-            }),
-            startDate: moment(PlanEjercicioSB[i].startDate).format("DD/MM/yyyy"),
-            endDate: moment(PlanEjercicioSB[i].endDate).format("DD/MM/yyyy"),
-          })
-        }
+        const PlanesEjercico = await getExercisePlansSP(authEmail)
 
         const { data: UserPersonalInformation, error: errorDataBase } = await supabase
           .from("UserPersonalInformation")
@@ -181,11 +138,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           )
           .eq("email", authEmail)
 
-        if (errorDataBase?.message || errorHistoricoPesos?.message || errorPlanEjercicio?.message) {
+        if (errorDataBase?.message) {
           console.log({
             errorDB: errorDataBase?.message,
-            errorHP: errorHistoricoPesos?.message,
-            errorPJ: errorPlanEjercicio?.message,
           })
         } else {
           dispatch(

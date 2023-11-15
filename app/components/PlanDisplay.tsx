@@ -7,6 +7,9 @@ import { layout } from "app/theme/global"
 import { Button, Text } from "app/components"
 import moment from "moment"
 import { Divider } from "@rneui/base"
+import { getExercisePlansSP, getHistoricWeights, supabase } from "app/services/supabaseService"
+import { useDispatch } from "react-redux"
+import { setExersicePlans, setExersices } from "app/store/user"
 
 interface PlanDisplayProps {
   plan: ExercisePlan
@@ -23,6 +26,39 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
       moment(a.date, "DD/MM/yyyy").toDate().getTime() -
       moment(b.date, "DD/MM/yyyy").toDate().getTime(),
   )
+  const dispatch = useDispatch()
+
+  const handleDeletePlan = async () => {
+    const { error: errorHistoricos } = await supabase
+      .from("HistoricoPesos")
+      .delete()
+      .eq("email", plan.email)
+
+    const { error: errorPlan } = await supabase
+      .from("PlanEjercicio")
+      .delete()
+      .eq("email", plan.email)
+
+    if (errorHistoricos?.message || errorPlan?.message) {
+      console.log({
+        plan: errorPlan?.message,
+        pesos: errorHistoricos?.message,
+      })
+    }
+
+    const HistoricoPesos = await getHistoricWeights(plan.email)
+
+    const PlanesEjercico = await getExercisePlansSP(plan.email)
+
+    dispatch(
+      setExersices(
+        HistoricoPesos.map((p) => {
+          return { ...p, date: moment(p.date).format("DD/MM/yyyy") }
+        }),
+      ),
+    )
+    dispatch(setExersicePlans(PlanesEjercico))
+  }
 
   return (
     <View
@@ -69,7 +105,13 @@ const PlanDisplay = ({ plan, showDeleteButton = true }: PlanDisplayProps) => {
         </View>
         <View style={styles.botones}>
           {showDeleteButton ? (
-            <Button text="Borrar" preset="smallDefault" />
+            <Button
+              text="Borrar"
+              preset="smallDefault"
+              onPress={() => {
+                handleDeletePlan()
+              }}
+            />
           ) : (
             <View style={layout.fill} />
           )}
