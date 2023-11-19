@@ -111,6 +111,22 @@ export const iconRegistry = {
   comida: require("../../assets/icons/comida.png"),
   mancuernas: require("../../assets/icons/mancuernas.png"),
   usuario: require("../../assets/icons/user.png"),
+  zanahoria: require("../../assets/icons/vegetal_1.png"),
+  berenjena: require("../../assets/icons/vegetal_2.png"),
+  jalapeño: require("../../assets/icons/vegetal_3.png"),
+  brocoli: require("../../assets/icons/vegetal_4.png"),
+  maiz: require("../../assets/icons/vegetal_5.png"),
+  lechuga: require("../../assets/icons/vegetal_6.png"),
+  ajo: require("../../assets/icons/vegetal_7.png"),
+  cebolla: require("../../assets/icons/vegetal_8.png"),
+  repollo: require("../../assets/icons/vegetal_9.png"),
+  ejercicio1: require("../../assets/icons/ejercicio_1.png"),
+  ejercicio2: require("../../assets/icons/ejercicio_2.png"),
+  ejercicio3: require("../../assets/icons/ejercicio_3.png"),
+  ejercicio4: require("../../assets/icons/ejercicio_4.png"),
+  ejercicio5: require("../../assets/icons/ejercicio_5.png"),
+  ejercicio6: require("../../assets/icons/ejercicio_6.png"),
+  ejercicio7: require("../../assets/icons/ejercicio_7.png"),
 }
 
 const $imageStyle: ImageStyle = {
