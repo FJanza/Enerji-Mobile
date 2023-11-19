@@ -16,6 +16,7 @@ import DatePicker from "react-native-date-picker"
 import { showAlert } from "app/utils/alert"
 import { appendRecipes, appendRecipesPlan } from "app/store/user"
 import PlanRecipesDisplay from "app/components/PlanRecipesDisplay"
+import Loading from "app/components/Loading"
 
 const hasRepeatedDayMoreThanThree = (array) => {
   // Obtener todos los valores de 'day' en un nuevo array
@@ -358,6 +359,8 @@ const GeneratorRecipesPlan = () => {
           disabled={loadingSave}
         />
       )}
+      <Loading type="vegetales" on={loadingGenerate} />
+      <Loading type="guardando" on={loadingSave} />
     </Screen>
   )
 }

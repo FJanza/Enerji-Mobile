@@ -18,6 +18,7 @@ interface PlanExerciseDisplayProps {
 
 const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisplayProps) => {
   const [showMore, setShowMore] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const rutinas = [...plan.routine]
 
@@ -29,6 +30,7 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
   const dispatch = useDispatch()
 
   const handleDeletePlan = async () => {
+    setLoading(true)
     const { error: errorHistoricos } = await supabase
       .from("HistoricoPesos")
       .delete()
@@ -60,6 +62,7 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
       ),
     )
     dispatch(setExersicePlans(PlanesEjercico))
+    setLoading(false)
   }
 
   return (
@@ -108,7 +111,8 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
         <View style={styles.botones}>
           {showDeleteButton ? (
             <Button
-              text="Borrar"
+              disabled={loading}
+              text={loading ? "Borrando" : "Borrar"}
               preset="smallDefault"
               onPress={() => {
                 handleDeletePlan()

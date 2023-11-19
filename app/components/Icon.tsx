@@ -127,6 +127,11 @@ export const CustomIcons = {
   ejercicio5: require("../../assets/icons/ejercicio_5.png"),
   ejercicio6: require("../../assets/icons/ejercicio_6.png"),
   ejercicio7: require("../../assets/icons/ejercicio_7.png"),
+  avion1: require("../../assets/icons/avion_1.png"),
+  avion2: require("../../assets/icons/avion_2.png"),
+  avion3: require("../../assets/icons/avion_3.png"),
+  avion4: require("../../assets/icons/avion_4.png"),
+  avion5: require("../../assets/icons/avion_5.png"),
 }
 
 const $imageStyle: ImageStyle = {

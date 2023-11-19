@@ -17,6 +17,7 @@ import { supabase } from "app/services/supabaseService"
 import DatePicker from "react-native-date-picker"
 import { showAlert } from "app/utils/alert"
 import { appendExersicePlan, appendExersices } from "app/store/user"
+import Loading from "app/components/Loading"
 
 const GeneratorExercisePlan = () => {
   const [trainingType, setTrainingType] = useState()
@@ -338,6 +339,8 @@ const GeneratorExercisePlan = () => {
           disabled={loadingSave}
         />
       )}
+      <Loading type="ejercicios" on={loadingGenerate} />
+      <Loading type="guardando" on={loadingSave} />
     </Screen>
   )
 }
