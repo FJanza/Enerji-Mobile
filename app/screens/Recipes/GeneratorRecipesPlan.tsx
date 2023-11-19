@@ -5,10 +5,8 @@ import { colors, spacing } from "app/theme"
 import { goBack } from "app/navigators"
 import { layout } from "app/theme/global"
 import { Picker } from "@react-native-picker/picker"
-import SelectDays from "app/components/SelectDays"
-import { Exercise, ExercisePlan } from "app/Interfaces/Interfaces"
-import PlanExerciseDisplay from "../../components/PlanExerciseDisplay"
-import { generateExercisePlan } from "app/services/enerjiApi"
+import { Recipe, RecipePlan } from "app/Interfaces/Interfaces"
+import { generateRecipePlan } from "app/services/enerjiApi"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "app/store"
 import { getDatesBetween, yearsToToday } from "app/utils/day"
@@ -16,14 +14,42 @@ import moment from "moment"
 import { supabase } from "app/services/supabaseService"
 import DatePicker from "react-native-date-picker"
 import { showAlert } from "app/utils/alert"
-import { appendExersicePlan, appendExersices } from "app/store/user"
+import { appendRecipes, appendRecipesPlan } from "app/store/user"
+import PlanRecipesDisplay from "app/components/PlanRecipesDisplay"
+
+const hasRepeatedDayMoreThanThree = (array) => {
+  // Obtener todos los valores de 'day' en un nuevo array
+  const days = array.map((subArray) => subArray.map((item) => item.day)).flat()
+
+  // Crear un objeto para contar las repeticiones de cada día
+  const dayCounts = days.reduce((counts, day) => {
+    counts[day] = (counts[day] || 0) + 1
+    return counts
+  }, {})
+
+  // Verificar si alguna repetición es mayor que tres
+  const hasDayRepeatedMoreThanThree = Object.values(dayCounts).some((count) => Number(count) > 3)
+
+  return hasDayRepeatedMoreThanThree
+}
+
+const hasUndefiendMomentOfDay = (array) => {
+  for (let i = 0; i < array.length; i++) {
+    for (let j = 0; j < array[i].length; j++) {
+      if (array[i][j].moment_of_the_day === undefined) {
+        return true // Si se encuentra algún momento undefined, retorna true
+      }
+    }
+  }
+  return false // Si no se encontró ningún momento undefined, retorna false
+}
 
 const GeneratorRecipesPlan = () => {
   const [trainingType, setTrainingType] = useState()
   const [duration, setDuration] = useState<string>()
-  const [planGenerated, setPlanGenerated] = useState<ExercisePlan>(undefined)
-  const [routines, setRoutines] = useState<Exercise[]>([])
-  const [daysOfWeek] = useState([])
+  const [planGenerated, setPlanGenerated] = useState<RecipePlan>(undefined)
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
   const [trainingTypes, setTrainingTypes] = useState([])
   const [bodyTypes, setBodyTypes] = useState([])
   const [loadingGenerate, setLoadingGenerate] = useState(false)
@@ -39,22 +65,24 @@ const GeneratorRecipesPlan = () => {
   const handleSavePlan = async () => {
     setLoadingSave(true)
 
-    dispatch(appendExersicePlan(planGenerated))
-    dispatch(appendExersices(routines))
+    dispatch(appendRecipesPlan(planGenerated))
+    dispatch(appendRecipes(recipes))
 
-    for (const exercise of routines) {
+    for (const recipe of recipes) {
       const { error } = await supabase
-        .from("HistoricoPesos")
+        .from("HistoricoRecetas")
         .insert([
           {
-            email: exercise.email,
-            musculo: exercise.muscle,
-            ejercicio: exercise.exercise,
-            fecha: moment(exercise.date, "DD/MM/yyyy").toDate(),
-            peso: exercise.weight,
-            series: exercise.series,
-            repeticiones: exercise.repeat,
-            id_plan: exercise.idPlan,
+            mail: recipe.email,
+            comida: recipe.food,
+            id_plan: recipe.idPlan,
+            calorías: recipe.cal,
+            proteína: recipe.protein,
+            preparación: recipe.recipe,
+            ingredientes: recipe.ingredients,
+            cumplio: recipe.done,
+            fecha: moment(recipe.date, "DD/MM/yyyy").toDate(),
+            momentoDelDia: recipe.dayMoment,
           },
         ])
         .select()
@@ -75,8 +103,9 @@ const GeneratorRecipesPlan = () => {
     let localPlan = newPlan
 
     if (!newPlan) {
+      // se genera el plan para conseguir el id
       const { data, error } = await supabase
-        .from("PlanEjercicio")
+        .from("PlanReceta")
         .insert([
           {
             email: personalInformation.email,
@@ -101,46 +130,54 @@ const GeneratorRecipesPlan = () => {
       setNewPlan(localPlan)
     }
 
-    const generatedPlan = await generateExercisePlan({
-      age: yearsToToday(moment(personalInformation.birthDate, "DD/MM/yyyy").toDate()),
-      cantDay: daysOfWeek.length,
-      excerciseType: trainingType,
-      bodyType: bodyTypes[personalInformation.bodyType],
-    })
+    // TODO catch error and reset
 
-    if (generatedPlan && localPlan) {
+    let generatedPlan
+    let i = 0
+
+    do {
+      console.log(i)
+      i > 0 && showAlert("Red de Palm inestable, disculpe la demora")
+
+      generatedPlan = await generateRecipePlan({
+        age: yearsToToday(moment(personalInformation.birthDate, "DD/MM/yyyy").toDate()),
+        dietType: personalInformation.dietType,
+        excerciseType: trainingType,
+        bodyType: bodyTypes[personalInformation.bodyType],
+      })
+
+      i++
+    } while (
+      i < 3 &&
+      (!generatedPlan ||
+        hasRepeatedDayMoreThanThree(generatedPlan) ||
+        hasUndefiendMomentOfDay(generatedPlan))
+    )
+
+    if (generatedPlan && i < 3) {
       const dates = daysOfWeek.map((day) => {
         return { day, dates: getDatesBetween(startDate, endDate, day) }
       })
 
-      const routinesOneWeek = generatedPlan.map((routineDay, i) => {
-        return routineDay.map((exe) => {
-          const { excercise_id: _, excercise: __, ...newExercise } = exe
-          return {
-            ...newExercise,
-            exercise: exe.excercise,
-            day: daysOfWeek[i],
-            idPlan: localPlan.id,
-            email: personalInformation.email,
-          }
-        })
-      })
+      const recipes = []
 
-      const routines = []
-
-      for (let i = 0; i < routinesOneWeek.length; i++) {
+      for (let i = 0; i < generatedPlan.length; i++) {
         for (let j = 0; j < dates.length; j++) {
-          if (routinesOneWeek[i][0].day === dates[j].day) {
+          if (generatedPlan[i][0].day === dates[j].day) {
             for (let k = 0; k < dates[j].dates.length; k++) {
-              routines.push(
-                routinesOneWeek[i].map((exercise) => {
-                  const { day: _, ...newExercise } = exercise
+              recipes.push(
+                generatedPlan[i].map((recipe) => {
                   return {
-                    ...newExercise,
                     date: moment(dates[j].dates[k]).format("DD/MM/yyyy"),
-                    repeat: Number(exercise.repeat),
-                    series: Number(exercise.series),
-                    weight: Number(exercise.weight),
+                    dayMoment: recipe.moment_of_the_day,
+                    email: personalInformation.email,
+                    food: recipe.food,
+                    cal: recipe.calories,
+                    protein: recipe.protein,
+                    recipe: recipe.preparation,
+                    ingredients: recipe.ingredients,
+                    done: false,
+                    idPlan: localPlan.id,
                   }
                 }),
               )
@@ -149,37 +186,28 @@ const GeneratorRecipesPlan = () => {
         }
       }
 
-      // eslint-disable-next-line prefer-spread
-      const concatenatedRoutines = [].concat.apply([], routines)
+      let concatenatedRoutines = recipes.flat()
 
-      // Usar un Set para almacenar etiquetas únicas
-      const uniqueDay = new Set()
-
-      // Filtrar el array y agregar las etiquetas únicas al Set
-      const filteredArray = routines.map((r) =>
-        r.filter((item) => {
-          const isUnique = !uniqueDay.has(
-            `${item.exercise}${moment(item.date, "DD/MM/yyyy").format("dddd")}`,
-          )
-          uniqueDay.add(`${item.exercise}${moment(item.date, "DD/MM/yyyy").format("dddd")}`)
-          return isUnique
-        }),
+      concatenatedRoutines = concatenatedRoutines.sort(
+        (a, b) =>
+          moment(a.date, "DD/MM/yyyy").toDate().getTime() -
+          moment(b.date, "DD/MM/yyyy").toDate().getTime(),
       )
 
-      // eslint-disable-next-line prefer-spread
-      const routineOfWeekToDisplay = [].concat.apply([], filteredArray)
+      const concatenatedWeekRoutines = concatenatedRoutines.slice(0, 21)
 
       setPlanGenerated({
         ...localPlan,
-        routine: routineOfWeekToDisplay,
+        recipes: concatenatedWeekRoutines,
         id: 1,
         duration: Number(duration),
       })
-      setRoutines(concatenatedRoutines)
-      showAlert("generado correctamente")
+      setRecipes(concatenatedRoutines)
+      showAlert("Plan generado")
     } else {
-      showAlert("Error al generar, intentelo de nuevo")
+      showAlert("Error al generar planes")
     }
+
     setLoadingGenerate(false)
   }
 
@@ -301,9 +329,7 @@ const GeneratorRecipesPlan = () => {
         </View>
 
         <Button
-          disabled={
-            loadingGenerate || !(trainingType !== "" && duration !== "" && daysOfWeek.length !== 0)
-          }
+          disabled={loadingGenerate || trainingType === "" || !duration || Number(duration) < 1}
           text={
             loadingGenerate
               ? "Generando.."
@@ -319,7 +345,7 @@ const GeneratorRecipesPlan = () => {
       </View>
 
       {planGenerated ? (
-        <PlanExerciseDisplay plan={planGenerated} showDeleteButton={false} />
+        <PlanRecipesDisplay plan={planGenerated} showDeleteButton={false} />
       ) : undefined}
 
       {planGenerated && (

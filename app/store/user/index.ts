@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
-import { Exercise, ExercisePlan, Recipe } from "app/Interfaces/Interfaces"
+import { Exercise, ExercisePlan, Recipe, RecipePlan } from "app/Interfaces/Interfaces"
 
 type PersonalInformation = {
   email: string
@@ -18,7 +18,7 @@ type User = {
   personalInformation: PersonalInformation
   exercisePlans: ExercisePlan[]
   exercises: Exercise[]
-  recipePlans: Recipe[]
+  recipePlans: RecipePlan[]
   recipes: Recipe[]
 }
 
@@ -103,6 +103,28 @@ const slice = createSlice({
 
       return newState
     },
+    setRecipes: (state, action: PayloadAction<Recipe[]>) => {
+      state.recipes = action.payload
+    },
+    appendRecipes: (state, action: PayloadAction<Recipe[]>) => {
+      const newState = {
+        ...state,
+        recipes: [...state.recipes, ...action.payload],
+      }
+
+      return newState
+    },
+    setRecipesPlans: (state, action: PayloadAction<RecipePlan[]>) => {
+      state.recipePlans = action.payload
+    },
+    appendRecipesPlan: (state, action: PayloadAction<RecipePlan>) => {
+      const newState = {
+        ...state,
+        recipePlans: [...state.recipePlans, action.payload],
+      }
+
+      return newState
+    },
   },
 })
 
@@ -115,6 +137,10 @@ export const {
   appendExersices,
   setExersicePlans,
   appendExersicePlan,
+  setRecipes,
+  appendRecipes,
+  setRecipesPlans,
+  appendRecipesPlan,
 } = slice.actions
 
 export default slice.reducer

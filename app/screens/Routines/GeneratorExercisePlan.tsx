@@ -172,7 +172,6 @@ const GeneratorExercisePlan = () => {
       setPlanGenerated({
         ...localPlan,
         routine: routineOfWeekToDisplay,
-        id: 1,
         duration: Number(duration),
       })
       setRoutines(concatenatedRoutines)

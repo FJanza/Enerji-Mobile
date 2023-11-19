@@ -19,12 +19,24 @@ import { colors, spacing } from "../theme"
 // import { useDispatch } from "react-redux"
 import { layout } from "app/theme/global"
 import { UserRegistration } from "app/Interfaces/Interfaces"
-import { getExercisePlansSP, getHistoricWeights, supabase } from "app/services/supabaseService"
+import {
+  getExercisePlansSP,
+  getHistoricRecipes,
+  getHistoricWeights,
+  getRecipePlansSP,
+  supabase,
+} from "app/services/supabaseService"
 import { Picker } from "@react-native-picker/picker"
 
 import { useDispatch } from "react-redux"
 
-import { setExersicePlans, setExersices, setUser } from "app/store/user"
+import {
+  setExersicePlans,
+  setExersices,
+  setRecipes,
+  setRecipesPlans,
+  setUser,
+} from "app/store/user"
 import DatePicker from "react-native-date-picker"
 import moment from "moment"
 import { capitalizeString } from "app/utils/text"
@@ -129,7 +141,14 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
         const HistoricoPesos = await getHistoricWeights(authEmail)
 
-        const PlanesEjercico = await getExercisePlansSP(authEmail)
+        const HistoricoRecetas = await getHistoricRecipes(authEmail)
+
+        const PlanesEjercicio = await getExercisePlansSP(authEmail)
+
+        const PlanesReceta = await getRecipePlansSP(authEmail)
+
+        console.log(HistoricoRecetas)
+        PlanesReceta.map((a) => console.log(a))
 
         const { data: UserPersonalInformation, error: errorDataBase } = await supabase
           .from("UserPersonalInformation")
@@ -160,7 +179,15 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               }),
             ),
           )
-          dispatch(setExersicePlans(PlanesEjercico))
+          dispatch(setExersicePlans(PlanesEjercicio))
+          dispatch(
+            setRecipes(
+              HistoricoRecetas.map((r) => {
+                return { ...r, date: moment(r.date).format("DD/MM/yyyy") }
+              }),
+            ),
+          )
+          dispatch(setRecipesPlans(PlanesReceta))
           setAuthToken(data.session.access_token)
         }
       }

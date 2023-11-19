@@ -6,9 +6,9 @@ import Collapsible from "react-native-collapsible"
 import { layout } from "app/theme/global"
 import { Button, Text } from "app/components"
 import moment from "moment"
-import { getExercisePlansSP, getHistoricWeights, supabase } from "app/services/supabaseService"
+import { getHistoricRecipes, getRecipePlansSP, supabase } from "app/services/supabaseService"
 import { useDispatch } from "react-redux"
-import { setExersicePlans, setExersices } from "app/store/user"
+import { setRecipes, setRecipesPlans } from "app/store/user"
 import RecipeDisplay from "./RecipeDisplay"
 
 interface PlanRecipesDisplayProps {
@@ -18,10 +18,9 @@ interface PlanRecipesDisplayProps {
 
 const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDisplayProps) => {
   const [showMore, setShowMore] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const recipes = [...plan.recipes]
-
-  const recipesSorted = recipes.sort(
+  const recipes = [...plan.recipes].sort(
     (a, b) =>
       moment(a.date, "DD/MM/yyyy").toDate().getTime() -
       moment(b.date, "DD/MM/yyyy").toDate().getTime(),
@@ -30,35 +29,39 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
   const dispatch = useDispatch()
 
   const handleDeletePlan = async () => {
+    setLoading(true)
     const { error: errorHistoricos } = await supabase
-      .from("HistoricoPesos")
+      .from("HistoricoRecetas")
       .delete()
-      .eq("email", plan.email)
+      .eq("mail", plan.email)
+      .eq("id_plan", plan.id)
 
     const { error: errorPlan } = await supabase
-      .from("PlanEjercicio")
+      .from("PlanReceta")
       .delete()
       .eq("email", plan.email)
+      .eq("id", plan.id)
 
     if (errorHistoricos?.message || errorPlan?.message) {
       console.log({
         plan: errorPlan?.message,
-        pesos: errorHistoricos?.message,
+        recetas: errorHistoricos?.message,
       })
     }
 
-    const HistoricoPesos = await getHistoricWeights(plan.email)
+    const HistoricoRecetas = await getHistoricRecipes(plan.email)
 
-    const PlanesEjercico = await getExercisePlansSP(plan.email)
+    const PlanesReceta = await getRecipePlansSP(plan.email)
 
     dispatch(
-      setExersices(
-        HistoricoPesos.map((p) => {
+      setRecipes(
+        HistoricoRecetas.map((p) => {
           return { ...p, date: moment(p.date).format("DD/MM/yyyy") }
         }),
       ),
     )
-    dispatch(setExersicePlans(PlanesEjercico))
+    dispatch(setRecipesPlans(PlanesReceta))
+    setLoading(false)
   }
 
   return (
@@ -107,8 +110,9 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
         <View style={styles.botones}>
           {showDeleteButton ? (
             <Button
-              text="Borrar"
+              text={loading ? "Borrando.." : "Borrar"}
               preset="smallDefault"
+              disabled={loading}
               onPress={() => {
                 handleDeletePlan()
               }}
@@ -130,14 +134,14 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
           <Text text="Duración: " preset="invertBold" />
           <Text text={`${plan.duration} meses`} preset="invertDefault" />
         </View>
-        {recipesSorted.map((r, i) => {
+        {recipes.map((r, i) => {
           return (
             <View
-              key={`${r.dayMoment}${r.date}`}
+              key={`${r.dayMoment}${r.date}${i}`}
               style={{ gap: spacing.xxs, paddingHorizontal: spacing.xs }}
             >
               {/* REVISAR CUANDO USEMOS LA API */}
-              {i === 0 || recipesSorted[i - 1].date !== r.date ? (
+              {i === 0 || recipes[i - 1].date !== r.date ? (
                 <>
                   <Text
                     text={`-${moment(r.date, "DD/MM/yyyy").format("dddd")}`}

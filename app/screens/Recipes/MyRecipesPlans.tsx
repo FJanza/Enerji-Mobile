@@ -8,151 +8,19 @@ import { layout } from "app/theme/global"
 import { useSelector } from "react-redux"
 import { RootState } from "app/store"
 import { ROUTES } from "app/utils/routes"
-import moment from "moment"
+
 import PlanRecipesDisplay from "app/components/PlanRecipesDisplay"
 
-const recipesDummy = [
-  {
-    email: "thebonitagamer777rexomg@gmail.com",
-    food: "Pancakes with banana and peanut butter",
-    cal: "350",
-    protein: "15",
-    recipe:
-      "Mix the flour, the milk, the eggs and the baking powder. Cook the pancakes in a frying pan for 2 minutes per side. Add the banana and peanut butter and fold.",
-    ingredients: [
-      "1 cup of flour",
-      "1 cup of milk",
-      "2 eggs",
-      "1 teaspoon of baking powder",
-      "1 banana",
-      "2 tablespoon of Peanut butter",
-    ],
-    done: false,
-    date: moment().format("DD/MM/yyyy"),
-    idPlan: "1",
-    dayMoment: "Breakfast",
-  },
-  {
-    email: "thebonitagamer777rexomg@gmail.com",
-    food: "Pancakes with banana and peanut butter",
-    cal: "350",
-    protein: "15",
-    recipe:
-      "Mix the flour, the milk, the eggs and the baking powder. Cook the pancakes in a frying pan for 2 minutes per side. Add the banana and peanut butter and fold.",
-    ingredients: [
-      "1 cup of flour",
-      "1 cup of milk",
-      "2 eggs",
-      "1 teaspoon of baking powder",
-      "1 banana",
-      "2 tablespoon of Peanut butter",
-    ],
-    done: false,
-    date: moment().format("DD/MM/yyyy"),
-    idPlan: "1",
-    dayMoment: "Lunch",
-  },
-  {
-    email: "thebonitagamer777rexomg@gmail.com",
-    food: "Pancakes with banana and peanut butter",
-    cal: "350",
-    protein: "15",
-    recipe:
-      "Mix the flour, the milk, the eggs and the baking powder. Cook the pancakes in a frying pan for 2 minutes per side. Add the banana and peanut butter and fold.",
-    ingredients: [
-      "1 cup of flour",
-      "1 cup of milk",
-      "2 eggs",
-      "1 teaspoon of baking powder",
-      "1 banana",
-      "2 tablespoon of Peanut butter",
-    ],
-    done: false,
-    date: moment().format("DD/MM/yyyy"),
-    idPlan: "1",
-    dayMoment: "Dinner",
-  },
-  {
-    email: "thebonitagamer777rexomg@gmail.com",
-    food: "Pancakes with banana and peanut butter",
-    cal: "350",
-    protein: "15",
-    recipe:
-      "Mix the flour, the milk, the eggs and the baking powder. Cook the pancakes in a frying pan for 2 minutes per side. Add the banana and peanut butter and fold.",
-    ingredients: [
-      "1 cup of flour",
-      "1 cup of milk",
-      "2 eggs",
-      "1 teaspoon of baking powder",
-      "1 banana",
-      "2 tablespoon of Peanut butter",
-    ],
-    done: false,
-    date: moment().add(1, "day").format("DD/MM/yyyy"),
-    idPlan: "1",
-    dayMoment: "Breakfast",
-  },
-  {
-    email: "thebonitagamer777rexomg@gmail.com",
-    food: "Pancakes with banana and peanut butter",
-    cal: "350",
-    protein: "15",
-    recipe:
-      "Mix the flour, the milk, the eggs and the baking powder. Cook the pancakes in a frying pan for 2 minutes per side. Add the banana and peanut butter and fold.",
-    ingredients: [
-      "1 cup of flour",
-      "1 cup of milk",
-      "2 eggs",
-      "1 teaspoon of baking powder",
-      "1 banana",
-      "2 tablespoon of Peanut butter",
-    ],
-    done: false,
-    date: moment().add(1, "day").format("DD/MM/yyyy"),
-    idPlan: "1",
-    dayMoment: "Lunch",
-  },
-  {
-    email: "thebonitagamer777rexomg@gmail.com",
-    food: "Pancakes with banana and peanut butter",
-    cal: "350",
-    protein: "15",
-    recipe:
-      "Mix the flour, the milk, the eggs and the baking powder. Cook the pancakes in a frying pan for 2 minutes per side. Add the banana and peanut butter and fold.",
-    ingredients: [
-      "1 cup of flour",
-      "1 cup of milk",
-      "2 eggs",
-      "1 teaspoon of baking powder",
-      "1 banana",
-      "2 tablespoon of Peanut butter",
-    ],
-    done: false,
-    date: moment().add(1, "day").format("DD/MM/yyyy"),
-    idPlan: "1",
-    dayMoment: "Dinner",
-  },
-]
-
-const recipePlanDummy = {
-  id: 1,
-  email: "",
-  recipes: recipesDummy,
-  startDate: moment().format("DD/MM/yyyy"),
-  endDate: moment().add(1, "months").format("DD/MM/yyyy"),
-  duration: 1,
-}
-
-const recipePlansDummy = [recipePlanDummy, recipePlanDummy]
-
 const MyRecipesPlans = () => {
+  const { recipePlans } = useSelector((state: RootState) => state.user)
+
   return (
     <Screen preset="scroll" contentContainerStyle={styles.container} statusBarStyle="light">
       <View style={{ gap: spacing.md }}>
         <View style={layout.rowBetween}>
           <Button
             onPress={() => {
-              navigate(ROUTES.MY_ROUTINES)
+              navigate(ROUTES.MY_RECIPES)
             }}
             text="Mis recetas"
             preset="reversed"
@@ -177,8 +45,8 @@ const MyRecipesPlans = () => {
           }
           ContentComponent={
             <View style={{ padding: spacing.xxs, gap: spacing.sm }}>
-              {recipePlansDummy.length > 0 ? (
-                recipePlansDummy.map((p, i) => {
+              {recipePlans.length > 0 ? (
+                recipePlans.map((p, i) => {
                   return <PlanRecipesDisplay plan={p} key={`${p.id}+${i}`} />
                 })
               ) : (

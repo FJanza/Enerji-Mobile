@@ -33,11 +33,13 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
       .from("HistoricoPesos")
       .delete()
       .eq("email", plan.email)
+      .eq("id_plan", plan.id)
 
     const { error: errorPlan } = await supabase
       .from("PlanEjercicio")
       .delete()
       .eq("email", plan.email)
+      .eq("id", plan.id)
 
     if (errorHistoricos?.message || errorPlan?.message) {
       console.log({

@@ -56,6 +56,51 @@ export const getExercisePlansSP = async (email: string) => {
   return PlanesEjercico
 }
 
+export const getRecipePlansSP = async (email: string) => {
+  const { data: PlanRecetaSB } = await supabase
+    .from("PlanReceta")
+    .select("id,email,startDate:desde,endDate:hasta,duration:duracion")
+    // Filters
+    .eq("email", email)
+
+  const PlanesReceta = []
+
+  for (let i = 0; i < PlanRecetaSB.length; i++) {
+    const { data: HistoricosRecetasPlan } = await supabase
+      .from("HistoricoRecetas")
+      .select(
+        'email:mail,food:comida,cal:"calorías",protein:"proteína",recipe:"preparación",done:cumplio,idPlan:id_plan,date:fecha,dayMoment:momentoDelDia,ingredients:ingredientes',
+      )
+      .eq("mail", email)
+      .eq("id_plan", PlanRecetaSB[i].id)
+
+    const unicos = []
+
+    HistoricosRecetasPlan.forEach((obj) => {
+      // Buscar si ya existe un objeto con el mismo atributo
+      const index = unicos.findIndex(
+        (el) =>
+          el.food === obj.food &&
+          el.dayMoment === obj.dayMoment &&
+          moment(el.date).format("dddd") === moment(obj.date).format("dddd"),
+      )
+
+      index === -1 && unicos.push(obj)
+    })
+
+    PlanesReceta.push({
+      ...PlanRecetaSB[i],
+      recipes: unicos.map((hp) => {
+        return { ...hp, date: moment(hp.date).format("DD/MM/yyyy") }
+      }),
+      startDate: moment(PlanRecetaSB[i].startDate).format("DD/MM/yyyy"),
+      endDate: moment(PlanRecetaSB[i].endDate).format("DD/MM/yyyy"),
+    })
+  }
+
+  return PlanesReceta
+}
+
 export const getHistoricWeights = async (email: string) => {
   const { data: HistoricoPesos } = await supabase
     .from("HistoricoPesos")
@@ -64,4 +109,13 @@ export const getHistoricWeights = async (email: string) => {
     )
     .eq("email", email)
   return HistoricoPesos
+}
+export const getHistoricRecipes = async (email: string) => {
+  const { data: HistoricoRecetas } = await supabase
+    .from("HistoricoRecetas")
+    .select(
+      'email:mail,food:comida,cal:"calorías",protein:"proteína",recipe:"preparación",done:cumplio,idPlan:id_plan,date:fecha,dayMoment:momentoDelDia,ingredients:ingredientes',
+    )
+    .eq("mail", email)
+  return HistoricoRecetas
 }
