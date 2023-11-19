@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from "react-native"
 
-export type IconTypes = keyof typeof iconRegistry
+export type IconTypes = keyof typeof CustomIcons
 
 interface IconProps extends TouchableOpacityProps {
   /**
@@ -78,13 +78,13 @@ export function Icon(props: IconProps) {
           size && { width: size, height: size },
           $imageStyleOverride,
         ]}
-        source={iconRegistry[icon]}
+        source={CustomIcons[icon]}
       />
     </Wrapper>
   )
 }
 
-export const iconRegistry = {
+export const CustomIcons = {
   back: require("../../assets/icons/back.png"),
   bell: require("../../assets/icons/bell.png"),
   caretLeft: require("../../assets/icons/caretLeft.png"),

@@ -26,12 +26,7 @@ const MyRecipes = () => {
   }, [selectedDate])
 
   return (
-    <Screen
-      preset="scroll"
-      contentContainerStyle={styles.container}
-      safeAreaEdges={["top"]}
-      statusBarStyle="light"
-    >
+    <Screen preset="scroll" contentContainerStyle={styles.container} statusBarStyle="light">
       <DatePicker
         options={{
           textHeaderColor: colors.palette.primary600,
@@ -109,6 +104,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingBottom: spacing.md,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   datePicker: {
     backgroundColor: colors.palette.neutral100,

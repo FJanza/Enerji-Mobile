@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-key */
 import React from "react"
 import { ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import { Icon, iconRegistry, IconTypes, Text } from "../../../components"
+import { Icon, CustomIcons, IconTypes, Text } from "../../../components"
 import { colors, spacing } from "../../../theme"
 import { Demo } from "../DemoShowroomScreen"
 import { DemoUseCase } from "../DemoUseCase"
@@ -40,7 +40,7 @@ export const DemoIcon: Demo = {
       description="List of icons registered inside the component."
       layout="row"
     >
-      {Object.keys(iconRegistry).map((icon) => (
+      {Object.keys(CustomIcons).map((icon) => (
         <View key={icon} style={$iconTile}>
           <Icon icon={icon as IconTypes} color={colors.tint} size={35} />
 

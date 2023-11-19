@@ -7,6 +7,13 @@ import { colors, spacing } from "app/theme"
 import { Button } from "./Button"
 import Collapsible from "react-native-collapsible"
 import { Chip } from "@rneui/base"
+import { CircularButton } from "./CircularButton"
+import { useDispatch, useSelector } from "react-redux"
+import { supabase } from "app/services/supabaseService"
+import moment from "moment"
+import { showAlert } from "app/utils/alert"
+import { setRecipes } from "app/store/user"
+import { RootState } from "app/store"
 
 interface Props {
   recipe: Recipe
@@ -16,6 +23,34 @@ interface Props {
 const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
   const [showMore, setShowMore] = useState(false)
 
+  const { recipes } = useSelector((state: RootState) => state.user)
+
+  const dispatch = useDispatch()
+
+  const handleButton = async () => {
+    showAlert("Guardando opción")
+
+    const { error } = await supabase
+      .from("HistoricoRecetas")
+      .update({ cumplio: recipe.done })
+      .eq("comida", recipe.food)
+      .eq("fecha", moment(recipe.date, "DD/MM/yyyy").format("yyyy-MM-DD"))
+      .eq("id_plan", recipe.idPlan)
+      .select()
+
+    error?.message && showAlert(error.message)
+
+    const updateRecipes = recipes.map((r) => {
+      if (r.food === recipe.food && r.date === recipe.date && r.idPlan === recipe.idPlan) {
+        return recipe
+      } else {
+        return r
+      }
+    })
+
+    dispatch(setRecipes(updateRecipes))
+  }
+
   return (
     <View style={{ gap: spacing.xs }}>
       <View>
@@ -24,25 +59,15 @@ const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
       </View>
       {actionButtons && (
         <View style={layout.rowBetween}>
-          <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
-            <View style={layout.fill}>
-              <Button
-                text={showMore ? "ver menos" : "ver más"}
-                preset="smallDefault"
-                onPress={() => {
-                  setShowMore((prev) => !prev)
-                }}
-              />
-            </View>
-          </View>
-
           <View style={[layout.centerAllWidth, layout.row]}>
-            <View style={layout.centerAllWidth}>
-              <Button text="ver más" preset="smallDefault" />
-            </View>
-            <View style={layout.centerAllWidth}>
-              <Button text="ver más" preset="smallDefault" />
-            </View>
+            <Button
+              text={showMore ? "ver menos" : "ver más"}
+              preset="smallDefault"
+              onPress={() => {
+                setShowMore((prev) => !prev)
+              }}
+              style={layout.fill}
+            />
           </View>
         </View>
       )}
@@ -73,6 +98,35 @@ const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
             <Text text="Receta" preset="invertBold" />
             <Text text={recipe.recipe} preset="invertDefault" />
           </View>
+          <View>
+            <Text text="Estado" preset="invertBold" />
+            <Text text={recipe.done ? "Se cumplio" : "No se cumplio"} preset="invertDefault" />
+
+            <View style={[layout.row, styles.buttons]}>
+              <CircularButton
+                icon="x"
+                iconSize={40}
+                preset="outlined"
+                disabled={!recipe.done}
+                iconColor={!recipe.done ? colors.palette.angry500 : colors.palette.neutral600}
+                onPress={() => {
+                  recipe.done = false
+                  handleButton()
+                }}
+              />
+              <CircularButton
+                icon="check"
+                iconSize={40}
+                disabled={recipe.done}
+                preset="outlined"
+                iconColor={recipe.done ? colors.palette.quiet300 : colors.palette.neutral600}
+                onPress={() => {
+                  recipe.done = true
+                  handleButton()
+                }}
+              />
+            </View>
+          </View>
         </View>
       </Collapsible>
     </View>
@@ -82,6 +136,7 @@ const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
 export default RecipeDisplay
 
 const styles = StyleSheet.create({
+  buttons: { gap: spacing.md, marginTop: spacing.xs },
   listOfIngriendts: { flexDirection: "row", flexWrap: "wrap", gap: spacing.xs },
   macroCard: {
     alignItems: "center",

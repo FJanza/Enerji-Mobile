@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   container: {
     gap: spacing.xl,
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
+    paddingVertical: spacing.sm,
   },
   dateText: {
     backgroundColor: colors.palette.primary100,
