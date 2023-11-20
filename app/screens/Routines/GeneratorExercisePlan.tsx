@@ -42,7 +42,27 @@ const GeneratorExercisePlan = () => {
 
     dispatch(appendExersicePlan(planGenerated))
     dispatch(appendExersices(routines))
-
+    for (const exercise of planGenerated.routine) {
+      const { error } = await supabase
+        .from("Ejercicios")
+        .insert([
+          {
+            correo: exercise.email,
+            peso: exercise.weight,
+            día: moment(exercise.date, "DD/MM/yyyy").format("dddd"),
+            músculo: exercise.muscle,
+            ejercicio: exercise.exercise,
+            repetir: exercise.repeat,
+            id_plan: exercise.idPlan,
+            // TODO sacar luego de eliminar columna en supa base
+            id_ejercicio: "a",
+          },
+        ])
+        .select()
+      if (error?.message) {
+        showAlert(error.message)
+      }
+    }
     for (const exercise of routines) {
       const { error } = await supabase
         .from("HistoricoPesos")

@@ -67,7 +67,7 @@ const MyRecipes = () => {
             })
           ) : (
             <Text
-              text={`No tienes ejercicios para ${
+              text={`No tienes recetas asignadas para ${
                 moment(selectedDate).isSame(moment())
                   ? "hoy"
                   : "el " + moment(selectedDate).format("DD/MM")

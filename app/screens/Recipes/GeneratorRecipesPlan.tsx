@@ -69,6 +69,28 @@ const GeneratorRecipesPlan = () => {
     dispatch(appendRecipesPlan(planGenerated))
     dispatch(appendRecipes(recipes))
 
+    for (const recipe of planGenerated.recipes) {
+      const { error } = await supabase
+        .from("Recetas")
+        .insert([
+          {
+            mail: recipe.email,
+            día: moment(recipe.date, "DD/MM/yyyy").format("dddd"),
+            moment_of_the_day: recipe.dayMoment,
+            comida: recipe.food,
+            calorías: recipe.cal,
+            proteína: recipe.protein,
+            preparación: recipe.recipe,
+            ingredientes: recipe.ingredients,
+            id_plan: recipe.idPlan,
+          },
+        ])
+        .select()
+      if (error?.message) {
+        showAlert(error.message)
+      }
+    }
+
     for (const recipe of recipes) {
       const { error } = await supabase
         .from("HistoricoRecetas")
@@ -137,7 +159,6 @@ const GeneratorRecipesPlan = () => {
     let i = 0
 
     do {
-      console.log(i)
       i > 0 && showAlert("Red de Palm inestable, disculpe la demora")
 
       generatedPlan = await generateRecipePlan({

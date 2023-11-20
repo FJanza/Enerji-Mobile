@@ -1,16 +1,6 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
-import {
-  persistReducer,
-  persistStore,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-  Storage,
-} from "redux-persist"
+import { persistReducer, persistStore, Storage } from "redux-persist"
 import { MMKV } from "react-native-mmkv"
 
 import { api } from "../services/api"
@@ -49,9 +39,7 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) => {
     const middlewares = getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
+      serializableCheck: false,
     }).concat(api.middleware)
 
     if (__DEV__ && !process.env.JEST_WORKER_ID) {
