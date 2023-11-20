@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   modalView: {
-    backgroundColor: "rgba(80,110,110,0.5)",
+    backgroundColor: "rgba(80,90,90,0.7)",
     height: "100%",
     width: "100%",
   },
