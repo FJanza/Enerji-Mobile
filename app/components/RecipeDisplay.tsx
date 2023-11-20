@@ -61,7 +61,7 @@ const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
         <View style={layout.rowBetween}>
           <View style={[layout.centerAllWidth, layout.row]}>
             <Button
-              text={showMore ? "ver menos" : "ver más"}
+              text={showMore ? "show less" : "show more"}
               preset="smallDefault"
               onPress={() => {
                 setShowMore((prev) => !prev)
@@ -72,9 +72,9 @@ const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
         </View>
       )}
       <Collapsible collapsed={!showMore} style={{ gap: spacing.sm }}>
-        <View>
+        <View style={{ gap: spacing.xs }}>
           <View style={{ gap: spacing.xs }}>
-            <Text text="Ingredientes" preset="invertBold" />
+            <Text text="Ingredients" preset="invertBold" />
             <View style={styles.listOfIngriendts}>
               {recipe.ingredients.map((ing) => {
                 return <Chip title={ing} key={ing} color={colors.palette.primary600} />
@@ -85,22 +85,28 @@ const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
             <Text text="Macros" preset="invertBold" />
             <View style={[layout.row, { gap: spacing.xs }]}>
               <View style={styles.macroCard}>
-                <Text text="Calorias" preset="invertBold" />
+                <Text text="Calories" preset="invertBold" />
                 <Text text={`${recipe.cal} Kcal`} preset="invertDefault" />
               </View>
               <View style={styles.macroCard}>
-                <Text text="Proteinas" preset="invertBold" />
+                <Text text="Proteins" preset="invertBold" />
                 <Text text={`${recipe.protein} g`} preset="invertDefault" />
               </View>
             </View>
           </View>
           <View>
-            <Text text="Receta" preset="invertBold" />
+            <Text text="Preparation" preset="invertBold" />
             <Text text={recipe.recipe} preset="invertDefault" />
           </View>
           <View>
-            <Text text="Estado" preset="invertBold" />
-            <Text text={recipe.done ? "Se cumplio" : "No se cumplio"} preset="invertDefault" />
+            <View style={layout.row}>
+              <Text text="State" preset="invertBold" />
+              <Text text=" (select option)" preset="invertDefault" />
+            </View>
+            <Text
+              text={recipe.done ? "Accomplished " : "not accomplished "}
+              preset="invertDefault"
+            />
 
             <View style={[layout.row, styles.buttons]}>
               <CircularButton

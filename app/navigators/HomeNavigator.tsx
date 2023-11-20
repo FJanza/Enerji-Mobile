@@ -53,7 +53,7 @@ export function HomeNavigator() {
         name="PlanEjercicio"
         component={RoutinesNavigator}
         options={{
-          tabBarLabel: "Ejercicio",
+          tabBarLabel: "Routines",
           tabBarIcon: ({ focused }) => (
             <Icon icon="mancuernas" color={focused && colors.tint} size={40} />
           ),
@@ -64,7 +64,7 @@ export function HomeNavigator() {
         name="PlanAlimenticio"
         component={RecipesNavigator}
         options={{
-          tabBarLabel: "Alimentación",
+          tabBarLabel: "Foods",
           tabBarIcon: ({ focused }) => (
             <Icon icon="comida" color={focused && colors.tint} size={40} />
           ),
@@ -75,7 +75,7 @@ export function HomeNavigator() {
         name="Perfil"
         component={Profile}
         options={{
-          tabBarLabel: "Perfil",
+          tabBarLabel: "Profile",
           tabBarIcon: ({ focused }) => (
             <Icon icon="usuario" color={focused && colors.tint} size={40} />
           ),

@@ -22,14 +22,14 @@ const MyRecipesPlans = () => {
             onPress={() => {
               navigate(ROUTES.MY_RECIPES)
             }}
-            text="Mis recetas"
+            text="My recipes"
             preset="reversed"
           />
           <Button
             onPress={() => {
               navigate(ROUTES.GENERATOR_RECIPES_PLAN)
             }}
-            text="Generador de planes"
+            text="Plan generator"
             preset="reversed"
           />
         </View>
@@ -37,7 +37,7 @@ const MyRecipesPlans = () => {
           style={styles.headerCard}
           HeadingComponent={
             <Text
-              text="Mis Planes"
+              text="My plans"
               preset="bold"
               size="xl"
               style={{ backgroundColor: colors.palette.primary600, paddingHorizontal: spacing.xs }}
@@ -51,7 +51,7 @@ const MyRecipesPlans = () => {
                 })
               ) : (
                 <Text
-                  text="No tienes planes todavia, prueba generando uno!"
+                  text="You don't have plans yet, try generating one!"
                   preset="invertDefault"
                   style={{ padding: spacing.xs }}
                 />

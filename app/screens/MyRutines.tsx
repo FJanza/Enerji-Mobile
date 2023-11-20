@@ -5,7 +5,6 @@ import { navigate } from "app/navigators"
 import { colors, spacing } from "app/theme"
 import DatePicker from "react-native-modern-datepicker"
 import moment from "moment"
-import { numToDayString } from "app/utils/day"
 import { Divider } from "@rneui/themed"
 import ExerciseDisplay from "app/components/ExerciseDisplay"
 import { useDispatch, useSelector } from "react-redux"
@@ -85,15 +84,12 @@ const MyRutines = () => {
         onPress={() => {
           navigate("MyExercisesPlanNavigator", { screen: "MyExercisePlans" })
         }}
-        text="Mis planes"
+        text="My plans"
       />
 
       <View>
         <View style={styles.cardHeader}>
-          <Text
-            text={`Entrenamiento - ${numToDayString(moment(selectedDate).day())}`}
-            weight="bold"
-          />
+          <Text text={`Training - ${moment(selectedDate).format("dddd")}`} weight="bold" />
         </View>
         <View style={styles.cardBody}>
           {exercisesOfDay.length > 0 ? (
@@ -116,23 +112,25 @@ const MyRutines = () => {
             })
           ) : (
             <Text
-              text={`No tienes ejercicios para ${
+              text={`You don't have exercises ${
                 moment(selectedDate).isSame(moment())
-                  ? "hoy"
-                  : "el " + moment(selectedDate).format("DD/MM")
+                  ? "today"
+                  : "on " + moment(selectedDate).format("DD/MM")
               }`}
               preset="invertDefault"
             />
           )}
         </View>
       </View>
-      <Button
-        disabled={loadingSaveWeights}
-        onPress={() => {
-          handleSaveWeights()
-        }}
-        text={loadingSaveWeights ? "Guardando pesos" : "Guardar pesos"}
-      />
+      {exercisesOfDay.length > 0 && (
+        <Button
+          disabled={loadingSaveWeights}
+          onPress={() => {
+            handleSaveWeights()
+          }}
+          text={loadingSaveWeights ? "Saving weights.." : "Save weights"}
+        />
+      )}
     </Screen>
   )
 }

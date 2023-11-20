@@ -63,7 +63,7 @@ const initialUserRegistration: Partial<UserRegistration> = {
   name: "",
   weight: 0,
   dietType: "",
-  sex: "Femenino",
+  sex: "Female",
 }
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
@@ -291,7 +291,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           secureTextEntry={isAuthPasswordHidden}
           labelTx="loginScreen.passwordFieldLabel"
           placeholderTx="loginScreen.passwordFieldPlaceholder"
-          helper="La contraseña debe tener 6 caracteres"
+          helper="Password must be 6 characters"
           HelperTextProps={{ size: "xs" }}
           RightAccessory={PasswordRightAccessory}
         />
@@ -305,9 +305,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
         />
         <View style={$registerButton}>
           <View style={layout.row}>
-            <Text text="Si no tienes cuenta puedes " />
+            <Text text="Don't have an account? " />
             <Pressable onPress={() => setOpenRegisterModal(true)}>
-              <Text text="registrarte" style={$registerUnderLine} />
+              <Text text="register" style={$registerUnderLine} />
             </Pressable>
           </View>
         </View>
@@ -332,7 +332,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                 <ScrollView showsVerticalScrollIndicator={false}>
                   <View style={$internalBodyModal}>
                     <TextField
-                      label="Nombre"
+                      label="Name"
                       onChangeText={(e) =>
                         setUserRegister((prev) => {
                           return { ...prev, name: e !== "" ? e : undefined }
@@ -340,7 +340,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       }
                     />
                     <TextField
-                      label="Apellido"
+                      label="Last name"
                       onChangeText={(e) =>
                         setUserRegister((prev) => {
                           return { ...prev, lastName: e !== "" ? e : undefined }
@@ -356,8 +356,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       }
                     />
                     <TextField
-                      label="Contraseña"
-                      helper="La contraseña debe tener 6 caracteres"
+                      label="Password"
+                      helper="Password must be 6 characters"
                       RightAccessory={CreatePasswordRightAccessory}
                       secureTextEntry={isAuthCreatePasswordHidden}
                       onChangeText={(e) =>
@@ -367,7 +367,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       }
                     />
                     <View style={{ gap: spacing.xxs }}>
-                      <Text text="Tipo de cuerpo" />
+                      <Text text="Body type" />
                       <Picker
                         style={$picker}
                         mode="dropdown"
@@ -384,25 +384,25 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       </Picker>
                     </View>
                     <View style={{ gap: spacing.xxs }}>
-                      <Text text="Sexo" />
+                      <Text text="Sex" />
                       <Picker
                         style={$picker}
                         mode="dropdown"
                         selectedValue={userRegister.sex}
                         onValueChange={(itemValue) =>
-                          itemValue === "Masculino" || itemValue === "Femenino"
+                          itemValue === "Male" || itemValue === "Female"
                             ? setUserRegister((prev) => {
                                 return { ...prev, sex: itemValue }
                               })
                             : null
                         }
                       >
-                        <Picker.Item label={"Masculino"} value={"Masculino"} />
-                        <Picker.Item label={"Femenino"} value={"Femenino"} />
+                        <Picker.Item label={"Male"} value={"Male"} />
+                        <Picker.Item label={"Female"} value={"Female"} />
                       </Picker>
                     </View>
                     <TextField
-                      label="Altura"
+                      label="Height"
                       keyboardType="decimal-pad"
                       placeholder="175 en cm"
                       placeholderTextColor={"#a3a3a3"}
@@ -413,7 +413,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       }
                     />
                     <View style={{ gap: spacing.xxs }}>
-                      <Text text="Tipo de dieta" />
+                      <Text text="Diet type" />
                       <Picker
                         style={$picker}
                         placeholder="Tipo de dieta"
@@ -431,7 +431,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       </Picker>
                     </View>
                     <View>
-                      <Text text="Fecha de nacimiento" />
+                      <Text text="Birthdate" />
                       <Pressable
                         onPress={() => {
                           setOpenDatePicker(true)
@@ -466,7 +466,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                       />
                     </View>
                     <TextField
-                      label="Peso"
+                      label="Weight"
                       keyboardType="decimal-pad"
                       placeholder="Ej: 76 en Kg"
                       placeholderTextColor={"#a3a3a3"}
@@ -484,10 +484,13 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                   text="Register"
                   style={$tapButton}
                   preset="reversed"
-                  onPress={() => handleRegister()}
+                  onPress={() => {
+                    handleRegister()
+                  }}
                   disabled={
                     userRegister.email === "" ||
                     userRegister.password === "" ||
+                    userRegister.password.length < 6 ||
                     userRegister.birthDate === "" ||
                     userRegister.bodyType === "" ||
                     userRegister.height === 0 ||
@@ -497,7 +500,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                   }
                 />
                 <Text
-                  text="Recuerda que luego de registrarte debe confirmar el proceso con el email que te enviamos"
+                  text="Remember that after registering you must confirm the process with the email we sent you"
                   size="xs"
                   weight="bold"
                 />
@@ -569,6 +572,7 @@ const $registerUnderLine: ViewStyle = {
 
 const $registerButton: ViewStyle = {
   display: "flex",
+  marginTop: spacing.xs,
   alignItems: "flex-end",
 }
 

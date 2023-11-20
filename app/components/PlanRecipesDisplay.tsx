@@ -80,7 +80,7 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
         <View style={styles.infoPrincipal}>
           {/* StartDate */}
           <View style={styles.dateTitle}>
-            <Text text={`Desde: `} preset="invertDefault" />
+            <Text text={`From: `} preset="invertDefault" />
 
             <Text
               text={plan.startDate}
@@ -94,7 +94,7 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
           </View>
           {/* EndDate */}
           <View style={styles.dateTitle}>
-            <Text text={`Hasta: `} preset="invertDefault" />
+            <Text text={`Until: `} preset="invertDefault" />
 
             <Text
               text={plan.endDate}
@@ -110,7 +110,7 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
         <View style={styles.botones}>
           {showDeleteButton ? (
             <Button
-              text={loading ? "Borrando.." : "Borrar"}
+              text={loading ? "Deleting.." : "Delete"}
               preset="smallDefault"
               disabled={loading}
               onPress={() => {
@@ -121,7 +121,7 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
             <View style={layout.fill} />
           )}
           <Button
-            text={showMore ? "Ver menos" : "Ver mas"}
+            text={showMore ? "Show less" : "Show more"}
             onPress={() => {
               setShowMore((prev) => !prev)
             }}
@@ -131,8 +131,8 @@ const PlanRecipesDisplay = ({ plan, showDeleteButton = true }: PlanRecipesDispla
       </View>
       <Collapsible collapsed={!showMore} style={{ gap: spacing.xxs }}>
         <View style={layout.row}>
-          <Text text="Duración: " preset="invertBold" />
-          <Text text={`${plan.duration} meses`} preset="invertDefault" />
+          <Text text="Duration: " preset="invertBold" />
+          <Text text={`${plan.duration} months`} preset="invertDefault" />
         </View>
         {recipes.map((r, i) => {
           return (

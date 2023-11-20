@@ -8,7 +8,7 @@ export interface User {
   height: number
   bodyType: string
   dietType: string
-  sex: "Masculino" | "Femenino"
+  sex: "Male" | "Female"
 }
 
 export interface UserRegistration extends User {

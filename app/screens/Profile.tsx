@@ -8,7 +8,6 @@ import Toast from "react-native-simple-toast"
 import { supabase } from "app/services/supabaseService"
 import { useDispatch, useSelector } from "react-redux"
 import { RootState } from "app/store"
-import { TRADUCTIONS } from "app/Interfaces/Interfaces"
 import { capitalizeString } from "app/utils/text"
 import { layout } from "app/theme/global"
 import { Picker } from "@react-native-picker/picker"
@@ -102,13 +101,8 @@ const Profile = () => {
   }, [])
 
   return (
-    <Screen
-      preset="scroll"
-      contentContainerStyle={styles.container}
-      safeAreaEdges={["top"]}
-      statusBarStyle="light"
-    >
-      <Text text="Tus Datos" preset="heading" />
+    <Screen preset="scroll" contentContainerStyle={styles.container} statusBarStyle="light">
+      <Text text="Your data" preset="heading" />
       {loadingInfo ? (
         <View style={{ gap: spacing.md, paddingTop: spacing.sm }}>
           <Skeleton animation="pulse" width={260} height={44} style={styles.skeleton} />
@@ -129,10 +123,7 @@ const Profile = () => {
                   attr[0] !== "weight" &&
                   attr[0] !== "dietType" && (
                     <View key={i}>
-                      <Text
-                        text={`${capitalizeString(TRADUCTIONS[attr[0]])}:`}
-                        preset="formLabel"
-                      />
+                      <Text text={`${capitalizeString(attr[0])}:`} preset="formLabel" />
                       <View style={layout.row}>
                         <Text text={`${attr[0] === "bodyType" ? bodyTypes[attr[1]] : attr[1]}`} />
                         <Text text={`${attr[0] === "height" ? "cm" : ""}`} />
@@ -146,7 +137,7 @@ const Profile = () => {
             })}
             {weight && (
               <View>
-                <Text text={"Peso (Kg):"} />
+                <Text text={"Weight (Kg):"} />
                 <TextField
                   keyboardType="number-pad"
                   value={String(weight)}
@@ -159,7 +150,7 @@ const Profile = () => {
 
             {dietType && (
               <View style={{ gap: spacing.xxxs }}>
-                <Text text="Tipo de dieta:" />
+                <Text text="Diet type:" />
                 <Picker
                   style={styles.picker}
                   mode="dropdown"
@@ -174,7 +165,7 @@ const Profile = () => {
             )}
           </View>
           <Button
-            text={guardandoCambios ? "Guardando..." : "Guardar cambios"}
+            text={guardandoCambios ? "Saving..." : "Save"}
             onPress={() => handleSaveData()}
             preset="reversed"
             disabled={guardandoCambios}

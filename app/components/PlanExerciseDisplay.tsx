@@ -81,7 +81,7 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
         <View style={styles.infoPrincipal}>
           {/* StartDate */}
           <View style={styles.dateTitle}>
-            <Text text={`Desde: `} preset="invertDefault" />
+            <Text text={`From: `} preset="invertDefault" />
 
             <Text
               text={plan.startDate}
@@ -95,7 +95,7 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
           </View>
           {/* EndDate */}
           <View style={styles.dateTitle}>
-            <Text text={`Hasta: `} preset="invertDefault" />
+            <Text text={`Until: `} preset="invertDefault" />
 
             <Text
               text={plan.endDate}
@@ -112,7 +112,7 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
           {showDeleteButton ? (
             <Button
               disabled={loading}
-              text={loading ? "Borrando" : "Borrar"}
+              text={loading ? "Deleting" : "Delete"}
               preset="smallDefault"
               onPress={() => {
                 handleDeletePlan()
@@ -122,7 +122,7 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
             <View style={layout.fill} />
           )}
           <Button
-            text={showMore ? "Ver menos" : "Ver mas"}
+            text={showMore ? "Show less" : "Show more"}
             onPress={() => {
               setShowMore((prev) => !prev)
             }}
@@ -132,8 +132,8 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
       </View>
       <Collapsible collapsed={!showMore} style={{ gap: spacing.xxs }}>
         <View style={layout.row}>
-          <Text text="Duración: " preset="invertBold" />
-          <Text text={`${plan.duration} meses`} preset="invertDefault" />
+          <Text text="Duration: " preset="invertBold" />
+          <Text text={`${plan.duration} months`} preset="invertDefault" />
         </View>
         {routinesSorted.map((r, i) => {
           return (

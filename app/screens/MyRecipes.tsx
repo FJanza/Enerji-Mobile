@@ -5,7 +5,6 @@ import { navigate } from "app/navigators"
 import { colors, spacing } from "app/theme"
 import DatePicker from "react-native-modern-datepicker"
 import moment from "moment"
-import { numToDayString } from "app/utils/day"
 import { Divider } from "@rneui/themed"
 
 import { useSelector } from "react-redux"
@@ -46,12 +45,12 @@ const MyRecipes = () => {
         onPress={() => {
           navigate(ROUTES.MY_RECIPES_PLANS_NAVIGATOR, { screen: ROUTES.MY_RECIPES_PLANS })
         }}
-        text="Mis planes"
+        text="My plans"
       />
 
       <View>
         <View style={styles.cardHeader}>
-          <Text text={`Comidas - ${numToDayString(moment(selectedDate).day())}`} weight="bold" />
+          <Text text={`Meals - ${moment(selectedDate).format("dddd")}`} weight="bold" />
         </View>
         <View style={styles.cardBody}>
           {recipesOfDay.length > 0 ? (
@@ -67,10 +66,10 @@ const MyRecipes = () => {
             })
           ) : (
             <Text
-              text={`No tienes recetas asignadas para ${
+              text={`You do not have recipes assigned ${
                 moment(selectedDate).isSame(moment())
-                  ? "hoy"
-                  : "el " + moment(selectedDate).format("DD/MM")
+                  ? "today"
+                  : "on " + moment(selectedDate).format("DD/MM")
               }`}
               preset="invertDefault"
             />

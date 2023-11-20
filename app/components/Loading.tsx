@@ -55,7 +55,7 @@ const Loading = ({ type, on = false }: Props) => {
             <View style={layout.Center}>
               <Icon icon={icons[currentIconIndex]} size={200} color={colors.palette.primary300} />
               <Text
-                text={type === "guardando" ? "Guardando datos..." : "Generando plan..."}
+                text={type === "guardando" ? "Saving data..." : "Generating plan..."}
                 style={{ color: colors.palette.primary300 }}
                 weight="bold"
               />

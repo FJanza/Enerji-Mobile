@@ -232,18 +232,18 @@ const GeneratorExercisePlan = () => {
       <View style={layout.rowBetweenCenter}>
         <Button
           LeftAccessory={() => <Icon icon="back" color={colors.palette.primary100} />}
-          text="Atras"
+          text="Back"
           onPress={() => {
             goBack()
           }}
           preset="smallReversed"
         />
       </View>
-      <Text text="Generador de Planes" preset="heading" numberOfLines={1} adjustsFontSizeToFit />
+      <Text text="Plan Generator" preset="heading" numberOfLines={1} adjustsFontSizeToFit />
 
       <View style={styles.filterContainer}>
         <View style={styles.trainingTypesContainer}>
-          <Text text="Tipo de entrenamiento" preset="invertBold" />
+          <Text text="Training Type" preset="invertBold" />
           <View style={styles.trainingTypesSelectContainer}>
             <Picker
               mode="dropdown"
@@ -264,8 +264,8 @@ const GeneratorExercisePlan = () => {
 
           <View>
             <View style={layout.row}>
-              <Text text="Duración " preset="invertBold" />
-              <Text text="(en meses)" preset="invertDefault" />
+              <Text text="Duration " preset="invertBold" />
+              <Text text="(in months)" preset="invertDefault" />
             </View>
             <View>
               <TextField
@@ -280,7 +280,7 @@ const GeneratorExercisePlan = () => {
           <View style={layout.rowBetweenCenter}>
             {/* StartDate */}
             <View style={styles.dateTitle}>
-              <Text text={`Fecha de incio: `} preset="invertBold" />
+              <Text text={`Start date: `} preset="invertBold" />
               <Pressable
                 onPress={() => {
                   setOpenStart(true)
@@ -309,7 +309,7 @@ const GeneratorExercisePlan = () => {
             </View>
             {/* EndDate */}
             <View style={styles.dateTitle}>
-              <Text text={`Fecha de fin: `} preset="invertBold" />
+              <Text text={`End date: `} preset="invertBold" />
 
               <Text
                 text={`${moment(startDate).add(Number(duration), "months").format("DD/MM/yyyy")}`}
@@ -320,7 +320,7 @@ const GeneratorExercisePlan = () => {
           </View>
         </View>
         <View style={{ gap: spacing.xxs }}>
-          <Text text="Seleccionar dias de la semana" preset="invertBold" />
+          <Text text="Select days of the week" preset="invertBold" />
           <SelectDays
             onDaysChanges={(days) => {
               setDaysOfWeek(days)
@@ -333,10 +333,10 @@ const GeneratorExercisePlan = () => {
           }
           text={
             loadingGenerate
-              ? "Generando.."
+              ? "Generating..."
               : planGenerated
-              ? "Generar otra versión"
-              : "Generar Plan"
+              ? "Generate another version"
+              : "Generate Plan"
           }
           preset="reversed"
           onPress={() => {
@@ -355,7 +355,7 @@ const GeneratorExercisePlan = () => {
             // navigate(ROUTES.MY_EXERCISES_PLANS)
             await handleSavePlan()
           }}
-          text={loadingSave ? "Guardando.." : "Guardar Plan"}
+          text={loadingSave ? "Saving.." : "Save Plan"}
           disabled={loadingSave}
         />
       )}

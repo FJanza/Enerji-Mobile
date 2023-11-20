@@ -16,13 +16,13 @@ const ExerciseDisplay = ({ exercise, changeWeight }: Props) => {
   return (
     <View style={{ gap: spacing.xs }}>
       <View style={layout.rowBetween}>
-        <Text text={`Ejercicio: ${exercise.exercise}`} preset="invertBold" numberOfLines={2} />
+        <Text text={`Exercise: ${exercise.exercise}`} preset="invertBold" numberOfLines={2} />
         <Text text={capitalizeString(exercise.muscle)} preset="invertBold" />
       </View>
       <View style={layout.rowBetween}>
         <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
           <View style={[layout.fill, { paddingLeft: spacing.xl }]}>
-            <Text text="Peso" preset="invertDefault" />
+            <Text text="Weight" preset="invertDefault" />
           </View>
         </View>
         <View style={[layout.centerAllWidth, layout.row]}>
