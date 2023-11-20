@@ -147,9 +147,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
         const PlanesReceta = await getRecipePlansSP(authEmail)
 
-        console.log(HistoricoRecetas)
-        PlanesReceta.map((a) => console.log(a))
-
         const { data: UserPersonalInformation, error: errorDataBase } = await supabase
           .from("UserPersonalInformation")
           .select(
