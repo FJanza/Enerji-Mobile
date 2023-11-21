@@ -196,9 +196,9 @@ const GeneratorExercisePlan = () => {
         duration: Number(duration),
       })
       setRoutines(concatenatedRoutines)
-      showAlert("generado correctamente")
+      showAlert("Generated succesfully")
     } else {
-      showAlert("Error al generar, intentelo de nuevo")
+      showAlert("Error generating, try again")
     }
     setLoadingGenerate(false)
   }

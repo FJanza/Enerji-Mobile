@@ -28,7 +28,7 @@ const RecipeDisplay = ({ recipe, actionButtons = true }: Props) => {
   const dispatch = useDispatch()
 
   const handleButton = async () => {
-    showAlert("Guardando opción")
+    showAlert("Save option")
 
     const { error } = await supabase
       .from("HistoricoRecetas")
