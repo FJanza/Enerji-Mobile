@@ -376,7 +376,7 @@ const GeneratorRecipesPlan = () => {
             // navigate(ROUTES.MY_EXERCISES_PLANS)
             await handleSavePlan()
           }}
-          text={loadingSave ? "Guardando.." : "Guardar Plan"}
+          text={loadingSave ? "Saving.." : "Save Plan"}
           disabled={loadingSave}
         />
       )}
