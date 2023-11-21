@@ -39,6 +39,7 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) => {
     const middlewares = getDefaultMiddleware({
+      immutableCheck: false,
       serializableCheck: false,
     }).concat(api.middleware)
 

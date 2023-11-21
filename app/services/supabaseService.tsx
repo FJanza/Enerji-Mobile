@@ -32,7 +32,11 @@ export const getExercisePlansSP = async (email: string) => {
 
     const unicos = []
 
-    HistoricosPesosPlan.forEach((obj) => {
+    HistoricosPesosPlan.sort(
+      (a, b) =>
+        moment(a.date, "yyyy-MM-DD").toDate().getTime() -
+        moment(b.date, "yyyy-MM-DD").toDate().getTime(),
+    ).forEach((obj) => {
       // Buscar si ya existe un objeto con el mismo atributo
       const index = unicos.findIndex(
         (el) =>
@@ -63,6 +67,8 @@ export const getRecipePlansSP = async (email: string) => {
     // Filters
     .eq("email", email)
 
+  const momentOrder = { Breakfast: 1, Lunch: 2, Dinner: 3 }
+
   const PlanesReceta = []
 
   for (let i = 0; i < PlanRecetaSB.length; i++) {
@@ -76,7 +82,20 @@ export const getRecipePlansSP = async (email: string) => {
 
     const unicos = []
 
-    HistoricosRecetasPlan.forEach((obj) => {
+    console.log(HistoricosRecetasPlan)
+
+    HistoricosRecetasPlan.sort((a, b) => {
+      const momentComparison = momentOrder[a.dayMoment] - momentOrder[b.dayMoment]
+      if (momentComparison !== 0) {
+        return momentComparison
+      } else {
+        if (moment(a.date, "yyyy-MM-DD").isSame(moment(b.date, "yyyy-MM-DD"))) {
+          return 0
+        } else {
+          return moment(a.date, "yyyy-MM-DD").isBefore(moment(b.date, "yyyy-MM-DD")) ? -1 : 1
+        }
+      }
+    }).forEach((obj) => {
       // Buscar si ya existe un objeto con el mismo atributo
       const index = unicos.findIndex(
         (el) =>

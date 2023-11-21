@@ -27,6 +27,8 @@ const PlanExerciseDisplay = ({ plan, showDeleteButton = true }: PlanExerciseDisp
       moment(a.date, "DD/MM/yyyy").toDate().getTime() -
       moment(b.date, "DD/MM/yyyy").toDate().getTime(),
   )
+  console.log(routinesSorted)
+
   const dispatch = useDispatch()
 
   const handleDeletePlan = async () => {

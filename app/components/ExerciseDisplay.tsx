@@ -16,8 +16,13 @@ const ExerciseDisplay = ({ exercise, changeWeight }: Props) => {
   return (
     <View style={{ gap: spacing.xs }}>
       <View style={layout.rowBetween}>
-        <Text text={`Exercise: ${exercise.exercise}`} preset="invertBold" numberOfLines={2} />
-        <Text text={capitalizeString(exercise.muscle)} preset="invertBold" />
+        <Text
+          text={`Exercise: ${exercise.exercise}`}
+          preset="invertBold"
+          numberOfLines={2}
+          style={styles.titleExercise}
+        />
+        <Text text={capitalizeString(exercise.muscle)} preset="invertBold" style={layout.fill} />
       </View>
       <View style={layout.rowBetween}>
         <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
@@ -68,4 +73,5 @@ const styles = StyleSheet.create({
   textField: {
     width: 55,
   },
+  titleExercise: { flex: 3 },
 })
