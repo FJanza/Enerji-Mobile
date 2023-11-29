@@ -4,7 +4,7 @@ import { Text } from "./Text"
 import { Exercise } from "app/Interfaces/Interfaces"
 import { layout } from "app/theme/global"
 import { TextField } from "./TextField"
-import { spacing } from "app/theme"
+import { colors, spacing } from "app/theme"
 import { capitalizeString } from "app/utils/text"
 
 interface Props {
@@ -22,7 +22,7 @@ const ExerciseDisplay = ({ exercise, changeWeight }: Props) => {
           numberOfLines={2}
           style={styles.titleExercise}
         />
-        <Text text={capitalizeString(exercise.muscle)} preset="invertBold" style={layout.fill} />
+        <Text text={capitalizeString(exercise.muscle)} preset="bold" style={styles.muscle} />
       </View>
       <View style={layout.rowBetween}>
         <View style={[layout.centerAllWidth, layout.row, { gap: spacing.xs }]}>
@@ -70,6 +70,13 @@ const ExerciseDisplay = ({ exercise, changeWeight }: Props) => {
 export default ExerciseDisplay
 
 const styles = StyleSheet.create({
+  muscle: {
+    alignSelf: "center",
+    backgroundColor: colors.palette.primary600,
+    borderRadius: 16,
+    justifyContent: "center",
+    padding: spacing.xs,
+  },
   textField: {
     width: 55,
   },
