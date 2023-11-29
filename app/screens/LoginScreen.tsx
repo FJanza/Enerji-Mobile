@@ -487,7 +487,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
                   disabled={
                     userRegister.email === "" ||
                     userRegister.password === "" ||
-                    userRegister.password.length < 6 ||
+                    userRegister.password?.length < 6 ||
                     userRegister.birthDate === "" ||
                     userRegister.bodyType === "" ||
                     userRegister.height === 0 ||
