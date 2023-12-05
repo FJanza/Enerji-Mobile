@@ -10,7 +10,7 @@ App mobile diseñada en React-native
 ## Deployment
 
 >[!NOTE]
-> recuerda seguir los pasos para instalar dependencias de la [ guia de react native CLI](https://reactnative.dev/docs/environment-setup#:~:text=Installing%20dependencies)
+> Recuerda seguir los pasos para instalar dependencias de la [ guia de react native CLI](https://reactnative.dev/docs/environment-setup#:~:text=Installing%20dependencies)
 
 To deploy this project run
 
