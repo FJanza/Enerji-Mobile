@@ -5,7 +5,12 @@ App mobile diseñada en React-native
 
 ![logoEnerji](https://github.com/FJanza/Enerji-Mobile/assets/62725867/305ff92c-75a1-410c-b029-4b7a3f474dd4)
 
+
+
 ## Deployment
+
+>[!NOTE]
+> recuerda seguir los pasos para instalar dependencias de la [ guia de react native CLI](https://reactnative.dev/docs/environment-setup#:~:text=Installing%20dependencies)
 
 To deploy this project run
 
